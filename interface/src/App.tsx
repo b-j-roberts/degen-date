@@ -8,7 +8,7 @@ import SwipePage from './pages/Swipe'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/dashboard" />,
+    element: <Navigate to="/swipe" />,
   },
   {
     path: '/dashboard',
