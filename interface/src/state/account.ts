@@ -20,6 +20,7 @@ interface State {
 }
 
 interface Actions {
+  isConnected: () => boolean
   connectWallet: () => void
   disconnectWallet: () => void
   startSession: () => void
@@ -89,6 +90,13 @@ const canSession = (wallet: any) => {
   return false
 }
 
+const ETHFees = [
+  {
+    tokenAddress: ETHTokenAddress,
+    maxAmount: parseUnits('0.1', 18).value.toString(),
+  },
+]
+
 const metaData = (isStarkFeeToken: boolean) => ({
   projectID: 'degen-date',
   txFees: isStarkFeeToken ? [] : ETHFees,
@@ -114,6 +122,9 @@ export const createAccountSlice: StateCreator<StoreState, [['zustand/immer', nev
   accountSessionSignature: null,
   usingSession: false,
 
+  isConnected: () => {
+    return get().wallet !== null && get().connectorData !== null && get().connector !== null
+  },
   connectWallet: async () => {
     const { wallet, connectorData, connector } = await connect({
       modalMode: 'alwaysAsk',

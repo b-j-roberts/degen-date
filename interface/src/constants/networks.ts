@@ -1,3 +1,4 @@
+/*
 import { Chain, sepolia } from '@starknet-react/chains'
 import { ChainProviderFactory } from '@starknet-react/core'
 import { RpcProvider } from 'starknet'
@@ -27,3 +28,4 @@ export const junoRpcProviders: ChainProviderFactory = (chain: Chain) => {
       return null
   }
 }
+*/
