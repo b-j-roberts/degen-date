@@ -1,11 +1,11 @@
 import { useAccount } from '@starknet-react/core'
 import { Column, Row } from 'components/Flex'
 import { getL2Connections } from 'connections'
+import { useConnectWallet } from 'hooks/useAccount'
 import { useWalletConnectModal } from 'hooks/useModal'
 import { useEffect } from 'react'
 import { styled } from 'styled-components'
-
-import { L2Option } from './Option'
+import { ThemedText } from 'theme/components'
 
 const StyledWalletConnect = styled(Row)`
   position: absolute;
@@ -19,6 +19,17 @@ const OptionsContainer = styled(Column)`
   gap: 16px;
   width: 100%;
   align-items: flex-start;
+`
+
+const StyledConnectButton = styled(Row)`
+  padding: 8px;
+  cursor: pointer;
+  position: relative;
+  width: 100%;
+  border: 3px solid transparent;
+  background: ${({ theme }) => theme.surface2};
+  border-radius: 8px;
+  padding: 8px 16px;
 `
 
 export default function WalletConnect() {
@@ -38,14 +49,15 @@ export default function WalletConnect() {
     }
   }, [toggle, l2Account])
 
+  const { connectWallet } = useConnectWallet()
+  const activate = () => connectWallet()
+
   return (
     <StyledWalletConnect>
       <OptionsContainer>
-        {l2Connections
-          .filter((connection) => connection.shouldDisplay())
-          .map((connection) => (
-            <L2Option key={connection.getName()} connection={connection} />
-          ))}
+        <StyledConnectButton gap={16} onClick={activate}>
+          <ThemedText.BodyPrimary>Connect Wallet</ThemedText.BodyPrimary>
+        </StyledConnectButton>
       </OptionsContainer>
     </StyledWalletConnect>
   )

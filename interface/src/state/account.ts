@@ -171,6 +171,9 @@ export const createAccountSlice: StateCreator<StoreState, [['zustand/immer', nev
     }
     const chainId = await provider.getChainId()
     const l2Wallet: any = get().wallet
+    console.log('l2Wallet', l2Wallet)
+    console.log('sessionParams', sessionParams)
+    console.log('chainId', chainId)
     const accountSessionSignature = await openSession({
       wallet: l2Wallet,
       sessionParams,
