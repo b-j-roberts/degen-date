@@ -52,6 +52,7 @@ services:
     links:
       - backend
     environment:
+      - AUTH_TOKEN=dna_placeholder
       - APIBARA_STREAM_URL=http://https://sepolia.starknet.a5a.ch
       - CONSUMER_TARGET_URL=http://degen-date-consumer-1:8081/consume-indexer-msg
       - PERSIST_TO_REDIS=redis://degen-date-redis-1:6379

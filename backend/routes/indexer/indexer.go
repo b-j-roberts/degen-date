@@ -1,16 +1,13 @@
 package indexer
 
 import (
-	"context"
-	"encoding/hex"
 	"fmt"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 
-	"github.com/b-j-roberts/degen-date/backend/internal/db"
 	routeutils "github.com/b-j-roberts/degen-date/backend/routes/utils"
+	u256 "github.com/holiman/uint256"
 )
 
 func InitIndexerRoutes() {
@@ -20,6 +17,25 @@ func InitIndexerRoutes() {
 type IndexerCursor struct {
 	OrderKey  int    `json:"orderKey"`
 	UniqueKey string `json:"uniqueKey"`
+}
+
+type IndexerEventWithTransaction struct {
+	EventWithTransaction struct {
+		Transaction IndexerTransaction `json:"transaction"`
+		Event       IndexerEvent       `json:"event"`
+	}
+}
+
+type IndexerTransaction struct {
+	Transaction struct {
+		Meta IndexerMeta `json:"meta"`
+	}
+}
+
+type IndexerMeta struct {
+	Meta struct {
+		Hash string `json:"hash"`
+	}
 }
 
 type IndexerEvent struct {
@@ -57,159 +73,190 @@ var FinalizedMessageQueue []IndexerMessage
 var FinalizedMessageLock = &sync.Mutex{}
 
 const (
-    newStonkEvent     = "0x03755b6d3f48992af15de25f545ee92c3cb4205c6b24d1aa65d93701bc3d63f9"
-    stonkClaimedEvent = "0x00e6009859f4b71dc66d2c774b2dc0852fce0cc94eb683969fdd8da1a07788fc"
+	memecoinLaunched = "0x0257c7875ae0eb2f487e258997d033dde6441d55296281bc727bc1e64b833cfd"
+	memecoinCreated  = "0x01be539d3a1327d450ab9b7a754f7708ea94f67182f2506217cafff2d694f8e1"
 )
 
-func processNewStonkEvent(event IndexerEvent) {
-  stonkIdHex := event.Event.Keys[1]
-  stonkAddress := event.Event.Data[0][2:] // remove 0x prefix
-  // stonkNameLengthHex := event.Event.Data[1] // TODO: Use this
-  stonkShortNameHex := event.Event.Data[2][2:] // remove 0x prefix
-  stonkShortNameLengthHex := event.Event.Data[3]
-  // stonkSymbolLengthHex := event.Event.Data[4] // TODO: Use this
-  stonkShortSymbolHex := event.Event.Data[5][2:] // remove 0x prefix
-  stonkShortSymbolLengthHex := event.Event.Data[6]
-  stonkDenominationLowHex := event.Event.Data[7]
-  // stonkDenominationHighHex := event.Event.Data[8] // TODO: Use this
+// func processNewStonkEvent(event IndexerEvent) {
+// 	stonkIdHex := event.Event.Keys[1]
+// 	stonkAddress := event.Event.Data[0][2:] // remove 0x prefix
+// 	// stonkNameLengthHex := event.Event.Data[1] // TODO: Use this
+// 	stonkShortNameHex := event.Event.Data[2][2:] // remove 0x prefix
+// 	stonkShortNameLengthHex := event.Event.Data[3]
+// 	// stonkSymbolLengthHex := event.Event.Data[4] // TODO: Use this
+// 	stonkShortSymbolHex := event.Event.Data[5][2:] // remove 0x prefix
+// 	stonkShortSymbolLengthHex := event.Event.Data[6]
+// 	stonkDenominationLowHex := event.Event.Data[7]
+// 	// stonkDenominationHighHex := event.Event.Data[8] // TODO: Use this
 
-  stonkId, err := strconv.ParseUint(stonkIdHex, 0, 64)
-  if err != nil {
-    PrintIndexerError("processNewStonkEvent", "error parsing stonk id", err, event.Event.Data)
-    return
-  }
+// 	stonkId, err := strconv.ParseUint(stonkIdHex, 0, 64)
+// 	if err != nil {
+// 		PrintIndexerError("processNewStonkEvent", "error parsing stonk id", err, event.Event.Data)
+// 		return
+// 	}
 
-  stonkShortName, err := hex.DecodeString(stonkShortNameHex)
-  if err != nil {
-    PrintIndexerError("processNewStonkEvent", "error decoding stonk short name", err, event.Event.Data)
-    return
-  }
+// 	stonkShortName, err := hex.DecodeString(stonkShortNameHex)
+// 	if err != nil {
+// 		PrintIndexerError("processNewStonkEvent", "error decoding stonk short name", err, event.Event.Data)
+// 		return
+// 	}
 
-  stonkShortNameLength, err := strconv.ParseUint(stonkShortNameLengthHex, 0, 64)
-  if err != nil {
-    PrintIndexerError("processNewStonkEvent", "error parsing stonk short name length", err, event.Event.Data)
-    return
-  }
-  stonkShortName = stonkShortName[len(stonkShortName)-int(stonkShortNameLength):]
+// 	stonkShortNameLength, err := strconv.ParseUint(stonkShortNameLengthHex, 0, 64)
+// 	if err != nil {
+// 		PrintIndexerError("processNewStonkEvent", "error parsing stonk short name length", err, event.Event.Data)
+// 		return
+// 	}
+// 	stonkShortName = stonkShortName[len(stonkShortName)-int(stonkShortNameLength):]
 
-  stonkShortSymbol, err := hex.DecodeString(stonkShortSymbolHex)
-  if err != nil {
-    PrintIndexerError("processNewStonkEvent", "error decoding stonk short symbol", err, event.Event.Data)
-    return
-  }
+// 	stonkShortSymbol, err := hex.DecodeString(stonkShortSymbolHex)
+// 	if err != nil {
+// 		PrintIndexerError("processNewStonkEvent", "error decoding stonk short symbol", err, event.Event.Data)
+// 		return
+// 	}
 
-  stonkShortSymbolLength, err := strconv.ParseUint(stonkShortSymbolLengthHex, 0, 64)
-  if err != nil {
-    PrintIndexerError("processNewStonkEvent", "error parsing stonk short symbol length", err, event.Event.Data)
-    return
-  }
-  stonkShortSymbol = stonkShortSymbol[len(stonkShortSymbol)-int(stonkShortSymbolLength):]
+// 	stonkShortSymbolLength, err := strconv.ParseUint(stonkShortSymbolLengthHex, 0, 64)
+// 	if err != nil {
+// 		PrintIndexerError("processNewStonkEvent", "error parsing stonk short symbol length", err, event.Event.Data)
+// 		return
+// 	}
+// 	stonkShortSymbol = stonkShortSymbol[len(stonkShortSymbol)-int(stonkShortSymbolLength):]
 
-  stonkDenominationLow, err := strconv.ParseUint(stonkDenominationLowHex, 0, 64)
-  if err != nil {
-    PrintIndexerError("processNewStonkEvent", "error parsing stonk denomination low", err, event.Event.Data)
-    return
-  }
+// 	stonkDenominationLow, err := strconv.ParseUint(stonkDenominationLowHex, 0, 64)
+// 	if err != nil {
+// 		PrintIndexerError("processNewStonkEvent", "error parsing stonk denomination low", err, event.Event.Data)
+// 		return
+// 	}
 
-  _, err = db.Db.Postgres.Exec(context.Background(), "INSERT INTO Stonks (id, address, name, symbol, denom) VALUES ($1, $2, $3, $4, $5)", stonkId, stonkAddress, string(stonkShortName), string(stonkShortSymbol), stonkDenominationLow);
-  if err != nil {
-    PrintIndexerError("processNewStonkEvent", "error inserting stonk in postgres", err)
-    return
-  }
+// 	_, err = db.Db.Postgres.Exec(context.Background(), "INSERT INTO Stonks (id, address, name, symbol, denom) VALUES ($1, $2, $3, $4, $5)", stonkId, stonkAddress, string(stonkShortName), string(stonkShortSymbol), stonkDenominationLow)
+// 	if err != nil {
+// 		PrintIndexerError("processNewStonkEvent", "error inserting stonk in postgres", err)
+// 		return
+// 	}
+// }
+
+// func revertNewStonkEvent(event IndexerEvent) {
+// 	stonkIdHex := event.Event.Keys[1]
+// 	stonkId, err := strconv.ParseUint(stonkIdHex, 0, 64)
+// 	if err != nil {
+// 		PrintIndexerError("revertNewStonkEvent", "error parsing stonk id", err, event.Event.Data)
+// 		return
+// 	}
+
+// 	_, err = db.Db.Postgres.Exec(context.Background(), "DELETE FROM Stonks WHERE id = $1", stonkId)
+// 	if err != nil {
+// 		PrintIndexerError("revertNewStonkEvent", "error deleting stonk in postgres", err)
+// 		return
+// 	}
+// }
+
+// func processStonkClaimedEvent(event IndexerEvent) {
+// 	/*
+// 	   #[key]
+// 	   pub stonk: u64,
+// 	   #[key]
+// 	   pub claimer: ContractAddress,
+// 	   pub amount: u256
+// 	*/
+// 	stonkIdHex := event.Event.Keys[1]
+// 	claimerAddress := event.Event.Keys[2][2:] // remove 0x prefix
+// 	amountHex := event.Event.Data[0]
+
+// 	stonkId, err := strconv.ParseUint(stonkIdHex, 0, 64)
+// 	if err != nil {
+// 		PrintIndexerError("processStonkClaimedEvent", "error parsing stonk id", err, event.Event.Data)
+// 		return
+// 	}
+
+// 	amount, err := strconv.ParseUint(amountHex, 0, 64)
+// 	if err != nil {
+// 		PrintIndexerError("processStonkClaimedEvent", "error parsing amount", err, event.Event.Data)
+// 		return
+// 	}
+
+// 	/*
+// 	   CREATE TABLE UserStonks (
+// 	     user_address char(64) NOT NULL,
+// 	     stonk_id int NOT NULL,
+// 	     balance int NOT NULL,
+// 	     PRIMARY KEY (user_address, stonk_id),
+// 	     FOREIGN KEY (stonk_id) REFERENCES Stonks(id)
+// 	   );
+// 	*/
+// 	_, err = db.Db.Postgres.Exec(context.Background(), "INSERT INTO UserStonks (user_address, stonk_id, balance) VALUES ($1, $2, $3) ON CONFLICT (user_address, stonk_id) DO UPDATE SET balance = UserStonks.balance + $3", claimerAddress, stonkId, amount)
+// 	if err != nil {
+// 		PrintIndexerError("processStonkClaimedEvent", "error inserting user stonk in postgres", err)
+// 		return
+// 	}
+// }
+
+// func revertStonkClaimedEvent(event IndexerEvent) {
+// 	stonkIdHex := event.Event.Keys[1]
+// 	claimerAddress := event.Event.Keys[2][2:] // remove 0x prefix
+// 	amountHex := event.Event.Data[0]
+
+// 	stonkId, err := strconv.ParseUint(stonkIdHex, 0, 64)
+// 	if err != nil {
+// 		PrintIndexerError("revertStonkClaimedEvent", "error parsing stonk id", err, event.Event.Data)
+// 		return
+// 	}
+
+// 	amount, err := strconv.ParseUint(amountHex, 0, 64)
+// 	if err != nil {
+// 		PrintIndexerError("revertStonkClaimedEvent", "error parsing amount", err, event.Event.Data)
+// 		return
+// 	}
+
+//		_, err = db.Db.Postgres.Exec(context.Background(), "UPDATE UserStonks SET balance = UserStonks.balance - $3 WHERE user_address = $1 AND stonk_id = $2", claimerAddress, stonkId, amount)
+//		if err != nil {
+//			PrintIndexerError("revertStonkClaimedEvent", "error updating user stonk in postgres", err)
+//			return
+//		}
+//	}
+const UNRUGGABLE_CONTRACT_ADDRESS = "0x00494a72a742b7880725a965ee487d937fa6d08a94ba4eb9e29dd0663bc653a2"
+
+func processMemecoinCreationEvent(event IndexerEvent) {
+	fmt.Printf("event memcoin created: %+v\n", event)
+
+	if event.Event.FromAddress != UNRUGGABLE_CONTRACT_ADDRESS {
+		PrintIndexerError("processMemecoinCreationEvent", "event from unsuported contract", event.Event.FromAddress)
+		return
+	}
+
+	// owner := event.Event.Data[0]
+	// name := event.Event.Data[1]
+	// symbol := event.Event.Data[2]
+	// supply, err := u256.FromHex(event.Event.Data[4] + event.Event.Data[3][2:])
+	// if err != nil {
+	// 	PrintIndexerError("processMemecoinCreationEvent", "error parsing supply", err, event.Event.Data[4], event.Event.Data[3])
+	// 	return
+	// }
+	// memecoin_address := event.Event.Data[5]
 }
 
-func revertNewStonkEvent(event IndexerEvent) {
-  stonkIdHex := event.Event.Keys[1]
-  stonkId, err := strconv.ParseUint(stonkIdHex, 0, 64)
-  if err != nil {
-    PrintIndexerError("revertNewStonkEvent", "error parsing stonk id", err, event.Event.Data)
-    return
-  }
-
-  _, err = db.Db.Postgres.Exec(context.Background(), "DELETE FROM Stonks WHERE id = $1", stonkId)
-  if err != nil {
-    PrintIndexerError("revertNewStonkEvent", "error deleting stonk in postgres", err)
-    return
-  }
+func revertMemecoinCreationEvent(event IndexerEvent) {
+	// Do nothing we don't care about that one
 }
 
-func processStonkClaimedEvent(event IndexerEvent) {
-  /*
-    #[key]
-    pub stonk: u64,
-    #[key]
-    pub claimer: ContractAddress,
-    pub amount: u256
-  */
-  stonkIdHex := event.Event.Keys[1]
-  claimerAddress := event.Event.Keys[2][2:] // remove 0x prefix
-  amountHex := event.Event.Data[0]
-
-  stonkId, err := strconv.ParseUint(stonkIdHex, 0, 64)
-  if err != nil {
-    PrintIndexerError("processStonkClaimedEvent", "error parsing stonk id", err, event.Event.Data)
-    return
-  }
-
-  amount, err := strconv.ParseUint(amountHex, 0, 64)
-  if err != nil {
-    PrintIndexerError("processStonkClaimedEvent", "error parsing amount", err, event.Event.Data)
-    return
-  }
-
-  /*
-    CREATE TABLE UserStonks (
-      user_address char(64) NOT NULL,
-      stonk_id int NOT NULL,
-      balance int NOT NULL,
-      PRIMARY KEY (user_address, stonk_id),
-      FOREIGN KEY (stonk_id) REFERENCES Stonks(id)
-    );
-  */
-  _, err = db.Db.Postgres.Exec(context.Background(), "INSERT INTO UserStonks (user_address, stonk_id, balance) VALUES ($1, $2, $3) ON CONFLICT (user_address, stonk_id) DO UPDATE SET balance = UserStonks.balance + $3", claimerAddress, stonkId, amount)
-  if err != nil {
-    PrintIndexerError("processStonkClaimedEvent", "error inserting user stonk in postgres", err)
-    return
-  }
+func processMemecoinLaunchEvent(event IndexerEvent) {
 }
 
-func revertStonkClaimedEvent(event IndexerEvent) {
-  stonkIdHex := event.Event.Keys[1]
-  claimerAddress := event.Event.Keys[2][2:] // remove 0x prefix
-  amountHex := event.Event.Data[0]
-
-  stonkId, err := strconv.ParseUint(stonkIdHex, 0, 64)
-  if err != nil {
-    PrintIndexerError("revertStonkClaimedEvent", "error parsing stonk id", err, event.Event.Data)
-    return
-  }
-
-  amount, err := strconv.ParseUint(amountHex, 0, 64)
-  if err != nil {
-    PrintIndexerError("revertStonkClaimedEvent", "error parsing amount", err, event.Event.Data)
-    return
-  }
-
-  _, err = db.Db.Postgres.Exec(context.Background(), "UPDATE UserStonks SET balance = UserStonks.balance - $3 WHERE user_address = $1 AND stonk_id = $2", claimerAddress, stonkId, amount)
-  if err != nil {
-    PrintIndexerError("revertStonkClaimedEvent", "error updating user stonk in postgres", err)
-    return
-  }
+func revertMemecoinLaunchEvent(event IndexerEvent) {
+	// todo
 }
 
 var eventProcessors = map[string](func(IndexerEvent)){
-    newStonkEvent: processNewStonkEvent,
-    stonkClaimedEvent: processStonkClaimedEvent,
+	memecoinCreated:  processMemecoinCreationEvent,
+	memecoinLaunched: processMemecoinLaunchEvent,
 }
 
 var eventReverters = map[string](func(IndexerEvent)){
-    newStonkEvent: revertNewStonkEvent,
-    stonkClaimedEvent: revertStonkClaimedEvent,
+	memecoinCreated:  revertMemecoinCreationEvent,
+	memecoinLaunched: revertMemecoinLaunchEvent,
 }
 
 var eventRequiresOrdering = map[string]bool{
-    newStonkEvent: true,
-    stonkClaimedEvent: true,
+	memecoinCreated:  true,
+	memecoinLaunched: true,
 }
 
 const (
