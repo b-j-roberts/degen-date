@@ -216,8 +216,6 @@ const (
 const UNRUGGABLE_CONTRACT_ADDRESS = "0x00494a72a742b7880725a965ee487d937fa6d08a94ba4eb9e29dd0663bc653a2"
 
 func processMemecoinCreationEvent(event IndexerEvent) {
-	fmt.Printf("event memcoin created: %+v\n", event)
-
 	if event.Event.FromAddress != UNRUGGABLE_CONTRACT_ADDRESS {
 		PrintIndexerError("processMemecoinCreationEvent", "event from unsuported contract", event.Event.FromAddress)
 		return
@@ -238,7 +236,18 @@ func processMemecoinCreationEvent(event IndexerEvent) {
 }
 
 func revertMemecoinCreationEvent(event IndexerEvent) {
-	// Do nothing we don't care about that one
+	if event.Event.FromAddress != UNRUGGABLE_CONTRACT_ADDRESS {
+		PrintIndexerError("processMemecoinCreationEvent", "event from unsuported contract", event.Event.FromAddress)
+		return
+	}
+
+	address := event.Event.Data[5][2:]
+	_, err := db.Db.Postgres.Exec(context.Background(), "DELETE FROM MemeCoins WHERE address = $1", address)
+	if err != nil {
+		PrintIndexerError("revertMemecoinCreationEvent", "error reverting new memecoin in postgres", err, address)
+		return
+	}
+
 }
 
 func processMemecoinLaunchEvent(event IndexerEvent) {
