@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS MemeCoins (
   address char(64) NOT NULL,
   launched bool NOT NULL DEFAULT FALSE,
   quote_token char(64),
-  exchange_name char(64),
+  exchange_name char(64)
 );
 
 -- CREATE TABLE IF NOT EXISTS Inscriptions (

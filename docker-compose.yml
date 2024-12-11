@@ -45,6 +45,11 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=password
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8081"]
+        interval: 5s
+        timeout: 20s
+        retries: 5
   indexer:
     build:
       dockerfile: indexer/Dockerfile
@@ -60,6 +65,8 @@ services:
     volumes:
       - configs:/configs
     restart: on-failure
+    depends_on:
+      - consumer
   frontend:
     build:
       dockerfile: interface/Dockerfile
