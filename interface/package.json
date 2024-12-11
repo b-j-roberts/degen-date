@@ -6,6 +6,8 @@
     "lint:fix": "eslint src --fix"
   },
   "dependencies": {
+    "@cartridge/connector": "^0.3.46",
+    "@cartridge/controller": "^0.3.46",
     "@starknet-react/chains": "^0.1.7",
     "@starknet-react/core": "^2.8.2",
     "clsx": "^2.1.1",

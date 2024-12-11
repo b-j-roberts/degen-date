@@ -1,3 +1,4 @@
+import ControllerConnector from '@cartridge/connector'
 import ARGENT_X_ICON from 'assets/argent-x.svg'
 import ARGENTMOBILE_ICON from 'assets/argentmobile.svg'
 import BRAAVOS_ICON from 'assets/braavos.svg'
@@ -90,8 +91,29 @@ const argentMobileConnection: L2Connection = {
   shouldDisplay: () => true,
 }
 
+const ETH_TOKEN_ADDRESS = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7'
+
+const cartridge = new ControllerConnector({
+  policies: [
+    {
+      target: ETH_TOKEN_ADDRESS,
+      method: 'approve',
+      description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+    },
+    {
+      target: ETH_TOKEN_ADDRESS,
+      method: 'transfer',
+    },
+    // Add more policies as needed
+  ],
+  rpc: 'https://api.cartridge.gg/x/starknet/sepolia',
+  // Uncomment to use a custom theme
+  // theme: "dope-wars",
+  // colorMode: "light"
+})
+
 // GETTERS
 
 export function getL2Connections() {
-  return [argentXWalletConnection, argentMobileConnection, braavosWalletConnection, webWalletConnection]
+  return [argentXWalletConnection, argentMobileConnection, braavosWalletConnection, webWalletConnection, cartridge]
 }
