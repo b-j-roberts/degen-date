@@ -20,7 +20,7 @@ export const ThemedText = {
     return <TextWrapper fontWeight={485} fontSize={16} color="neutral1" {...props} />
   },
   BodySecondary(props: TextProps) {
-    return <TextWrapper fontWeight={485} fontSize={16} color="neutral2" {...props} />
+    return <TextWrapper fontWeight={400} fontSize={16} color="neutral2" {...props} />
   },
   HeadlineSmall(props: TextProps) {
     return <TextWrapper fontWeight={485} fontSize={20} lineHeight="28px" color="neutral1" {...props} />

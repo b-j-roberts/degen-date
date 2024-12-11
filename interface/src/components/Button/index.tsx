@@ -1,55 +1,25 @@
 import { styled } from 'styled-components'
 
-export const SecondaryButton = styled.button`
-  font-size: 20px;
-  color: ${({ theme }) => theme.surface1};
-  background: ${({ theme }) => theme.neutral1};
-  cursor: pointer;
-  position: relative;
-  padding: 6px 8px;
-  margin: 0 10px;
-  width: auto;
-  border: none;
+export const PrimaryButton = styled.button`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 32px;
+  color: ${({ theme }) => theme.neutral1};
   outline: none;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 500;
+  transition: opacity 100ms;
 
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  background: radial-gradient(50% 50% at 50% 50%, #6321f2 0%, #7236f3 100%);
+  box-shadow: ${({ theme }) => `0px 4px 4px ${theme.surface1}40, 0px 4px 20px 4px ${theme.accent1}64`};
+  border: 2px solid ${({ theme }) => theme.neutral1}60;
+  border-radius: 14px;
 
-  &:enabled:active {
-    transform: translateY(2px);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-
-  &::before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 10px;
-    bottom: 10px;
-    left: -10px;
-    right: -10px;
-    background: ${({ theme }) => theme.neutral1};
-    z-index: -1;
-  }
-
-  &::after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 4px;
-    bottom: 4px;
-    left: -6px;
-    right: -6px;
-    background: ${({ theme }) => theme.neutral1};
-    z-index: -1;
+  &:focus {
+    background: ${({ theme }) => theme.accent1};
+    opacity: 0.8;
   }
 `

@@ -21,8 +21,6 @@ export function ActiveLink({ children, to, ...props }: ActiveLinkProps) {
     return formatedPathname.indexOf(formatedHref) === 0 ? clsx(childClassName, 'active') : childClassName
   }, [formatUrl, pathname, to, childClassName])
 
-  console.log(className)
-
   if (!children) return null
 
   return (
