@@ -15,7 +15,7 @@ Api:
 Consumer:
   Port: 8081
 Postgres:
-  Host: localhost
+  Host: degen-date-postgres-1
   Port: 5432
   User: degen-date-user
   Name: degen-date-db
