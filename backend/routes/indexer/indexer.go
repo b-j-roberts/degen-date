@@ -1,11 +1,13 @@
 package indexer
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/b-j-roberts/degen-date/backend/internal/db"
 	routeutils "github.com/b-j-roberts/degen-date/backend/routes/utils"
 )
 
@@ -221,15 +223,18 @@ func processMemecoinCreationEvent(event IndexerEvent) {
 		return
 	}
 
-	// owner := event.Event.Data[0]
-	// name := event.Event.Data[1]
-	// symbol := event.Event.Data[2]
-	// supply, err := u256.FromHex(event.Event.Data[4] + event.Event.Data[3][2:])
-	// if err != nil {
-	// 	PrintIndexerError("processMemecoinCreationEvent", "error parsing supply", err, event.Event.Data[4], event.Event.Data[3])
-	// 	return
-	// }
-	// memecoin_address := event.Event.Data[5]
+	owner := event.Event.Data[0][2:]
+	name := event.Event.Data[1][2:]
+	symbol := event.Event.Data[2][2:]
+	supply := event.Event.Data[4][2:] + event.Event.Data[3][2:]
+	address := event.Event.Data[5][2:]
+
+	_, err := db.Db.Postgres.Exec(context.Background(), "INSERT INTO MemeCoins VALUES ($1, $2, $3, $4, $5)", owner, name, symbol, supply, address)
+	if err != nil {
+		PrintIndexerError("processMemecoinCreationEvent", "error inserting new memecoin in postgres", err)
+		return
+	}
+
 }
 
 func revertMemecoinCreationEvent(event IndexerEvent) {
