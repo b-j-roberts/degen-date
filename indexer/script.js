@@ -14,7 +14,7 @@ export const config = {
           MEMECOIN_LAUNCHED_EVENT_KEY 
         ],
         includeReverted: false,
-        includeTransaction: false,
+        includeTransaction: true,
         includeReceipt: false
       },
     ]
