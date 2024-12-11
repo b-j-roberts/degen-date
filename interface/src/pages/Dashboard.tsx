@@ -1,5 +1,8 @@
-import { ThemedText } from 'theme/components'
+import { useDisconnect } from '@starknet-react/core'
+import { Button } from 'rebass'
 
 export default function DashboardPage() {
-  return <ThemedText.BodyPrimary>Dashboard</ThemedText.BodyPrimary>
+  const { disconnect } = useDisconnect()
+
+  return <Button onClick={() => disconnect()}>Disconnect</Button>
 }

@@ -1,9 +1,11 @@
 import { atom } from 'jotai'
 
-import { FieldName } from './utils'
-
-export const formFieldsAtom = atom<Record<FieldName, string>>({
+export const formFieldsAtom = atom<{
+  name: string
+  ticker: string
+  picture: FileReader['result'] | null
+}>({
   name: '',
   ticker: '',
-  picture: '',
+  picture: null,
 })
