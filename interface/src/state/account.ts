@@ -128,7 +128,8 @@ export const createAccountSlice: StateCreator<StoreState, [['zustand/immer', nev
   connectWallet: async () => {
     const { wallet, connectorData, connector } = await connect({
       modalMode: 'alwaysAsk',
-      webWalletUrl: process.env.REACT_APP_ARGENT_WEBWALLET_URL,
+      webWalletUrl: 'https://web-v2.hydrogen.argent47.net/email',
+      //webWalletUrl: 'https://web.argent.xyz/email',
       argentMobileOptions: {
         dappName: 'degen-date',
         url: window.location.hostname,
