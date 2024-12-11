@@ -72,7 +72,7 @@ services:
       dockerfile: interface/Dockerfile
       context: .
     ports:
-      - 3001:3001
+      - 3000:3000
     links:
       - backend
     volumes:
