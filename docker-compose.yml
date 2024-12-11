@@ -19,8 +19,8 @@ services:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRES_PASSWORD=password
-      - POSTGRES_USER=stonks-user
-      - POSTGRES_DB=stonks-db
+      - POSTGRES_USER=degen-date-user
+      - POSTGRES_DB=degen-date-db
   backend:
     build:
       dockerfile: backend/Dockerfile
@@ -45,40 +45,6 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=password
-  devnet:
-    image: shardlabs/starknet-devnet-rs:0.2.2
-    command:
-      - --dump-on=block
-      - --dump-path=/data/dump
-      - --seed=42
-    volumes:
-      - devnet:/data
-    ports:
-      - 5050:5050
-  deployer:
-    build:
-      dockerfile: onchain/Dockerfile.init
-      context: .
-    depends_on:
-      - devnet
-    restart: no
-    command: bash -c "./initialize.sh"
-    environment:
-      - SCARB=/root/.local/bin/scarb
-    volumes:
-      - configs:/configs
-  updater:
-    build:
-      dockerfile: onchain/Dockerfile.update
-      context: .
-    depends_on:
-      devnet:
-        condition: service_started
-      deployer:
-        condition: service_completed_successfully
-    command: bash -c "./update_devnet.sh"
-    volumes:
-      - configs:/configs
   apibara:
     image: quay.io/apibara/starknet:1.5.0
     command:
@@ -113,10 +79,10 @@ services:
       - backend
       - apibara
     environment:
-      - APIBARA_STREAM_URL=http://stonks-apibara-1:7171
-      - CONSUMER_TARGET_URL=http://stonks-consumer-1:8081/consume-indexer-msg
-      - PERSIST_TO_REDIS=redis://stonks-redis-1:6379
-      - INDEXER_ID=stonks-indexer-id
+      - APIBARA_STREAM_URL=http://degen-date-apibara-1:7171
+      - CONSUMER_TARGET_URL=http://degen-date-consumer-1:8081/consume-indexer-msg
+      - PERSIST_TO_REDIS=redis://degen-date-redis-1:6379
+      - INDEXER_ID=degen-date-indexer-id
     volumes:
       - configs:/configs
     restart: on-failure
@@ -128,10 +94,9 @@ services:
       deployer:
         condition: service_completed_successfully
     ports:
-      - 3000:3000
+      - 3001:3001
     links:
       - backend
-      - devnet
     volumes:
       - ./frontend/package.json:/app/package.json
       - ./frontend/package-lock.json:/app/package-lock.json
@@ -142,7 +107,6 @@ services:
 volumes:
   redis:
   postgres:
-  devnet:
   apibara:
   configs:
 

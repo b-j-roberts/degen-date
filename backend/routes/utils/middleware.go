@@ -3,7 +3,7 @@ package routeutils
 import (
 	"net/http"
 
-	"github.com/keep-starknet-strange/broly/backend/internal/config"
+	"github.com/b-j-roberts/degen-date/backend/internal/config"
 )
 
 // Middleware functions for routes

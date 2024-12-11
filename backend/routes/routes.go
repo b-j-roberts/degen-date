@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	routeutils "github.com/keep-starknet-strange/broly/backend/routes/utils"
+	routeutils "github.com/b-j-roberts/degen-date/backend/routes/utils"
 )
 
 func InitRoutes() {

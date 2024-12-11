@@ -15,5 +15,5 @@ Api:
 Postgres:
   Host: localhost
   Port: 5432
-  User: broly-user
-  Name: broly-db
+  User: degen-date-user
+  Name: degen-date-db

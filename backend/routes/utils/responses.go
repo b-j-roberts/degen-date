@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/keep-starknet-strange/broly/backend/internal/config"
+	"github.com/b-j-roberts/degen-date/backend/internal/config"
 )
 
 func SetupAccessHeaders(w http.ResponseWriter) {

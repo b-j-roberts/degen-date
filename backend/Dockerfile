@@ -13,8 +13,8 @@ RUN go mod download
 COPY ./apps/backend .
 
 # Build the app & run it
-RUN go build -o broly-api ./cmd/broly-api/main.go
+RUN go build -o degen-date-api ./cmd/degen-date-api/main.go
 
 EXPOSE 8080
 
-CMD ["./broly-api"]
+CMD ["./degen-date-api"]

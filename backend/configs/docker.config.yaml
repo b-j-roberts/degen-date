@@ -13,7 +13,7 @@ Api:
   Production: false
   Admin: true
 Postgres:
-  Host: broly-postgres-1
+  Host: degen-date-postgres-1
   Port: 5432
-  User: broly-user
-  Name: broly-db
+  User: degen-date-user
+  Name: degen-date-db

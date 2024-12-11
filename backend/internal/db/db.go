@@ -6,8 +6,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/b-j-roberts/degen-date/backend/internal/config"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/keep-starknet-strange/broly/backend/internal/config"
 )
 
 type Databases struct {

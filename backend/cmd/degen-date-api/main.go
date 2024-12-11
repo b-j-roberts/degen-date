@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/keep-starknet-strange/broly/backend/internal/config"
-	"github.com/keep-starknet-strange/broly/backend/internal/db"
-	"github.com/keep-starknet-strange/broly/backend/routes"
+	"github.com/b-j-roberts/degen-date/backend/internal/config"
+	"github.com/b-j-roberts/degen-date/backend/internal/db"
+	"github.com/b-j-roberts/degen-date/backend/routes"
 )
 
 func main() {
