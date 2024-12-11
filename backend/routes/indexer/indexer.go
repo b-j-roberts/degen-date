@@ -7,7 +7,6 @@ import (
 	"time"
 
 	routeutils "github.com/b-j-roberts/degen-date/backend/routes/utils"
-	u256 "github.com/holiman/uint256"
 )
 
 func InitIndexerRoutes() {

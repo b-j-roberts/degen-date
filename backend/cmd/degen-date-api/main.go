@@ -17,6 +17,7 @@ func main() {
 
 	routes.InitRoutes()
 	fmt.Println("Listening on port:", config.Conf.Api.Port)
+	fmt.Print("STARTED SERVER", config.Conf.Postgres.Name)
 	http.ListenAndServe(fmt.Sprintf(":%d", config.Conf.Api.Port), nil)
 	fmt.Println("Server stopped")
 }

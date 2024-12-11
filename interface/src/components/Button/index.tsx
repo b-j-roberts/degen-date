@@ -22,6 +22,12 @@ export const PrimaryButton = styled.button`
     background: ${({ theme }) => theme.accent1};
     opacity: 0.8;
   }
+
+  &:disabled {
+    background: ${({ theme }) => theme.neutral1}40;
+    box-shadow: none;
+    opacity: 0.6;
+  }
 `
 
 export const SecondaryButton = styled.button`

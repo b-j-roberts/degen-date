@@ -1,6 +1,6 @@
-import { selector } from 'starknet'
+export enum Entrypoint {
+  CreateMemecoin = 'create_memecoin',
+  LaunchOnEkubo = 'launch_on_ekubo',
+}
 
-export const CLICKS_OF_SELECTOR = selector.getSelector('clicks_of')
-export const TOTAL_CLICKS_SELECTOR = selector.getSelector('total_clicks')
-
-export const CLICK_ENTRYPOINT = 'click'
+export const DEFAULT_SUPPLY = 1_000_000_000_000_000_000_000_000_000n // 1B

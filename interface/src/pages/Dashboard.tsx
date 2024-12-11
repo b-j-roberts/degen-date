@@ -1,3 +1,4 @@
+import { useDisconnect } from '@starknet-react/core'
 import { CircleButton, PrimaryButton, SecondaryButton } from 'components/Button'
 import { Column, Row } from 'components/Flex'
 import styled from 'styled-components'
@@ -92,6 +93,8 @@ export default function DashboardPage() {
     return Number.parseFloat(amount).toFixed(2)
   }
 
+  const { disconnect } = useDisconnect()
+
   return (
     <Container>
       <DashboardInfo>
@@ -119,7 +122,7 @@ export default function DashboardPage() {
         </ButtonContainer>
       </DashboardInfo>
       <ButtonContainer>
-        <PrimaryButton>Logout</PrimaryButton>
+        <PrimaryButton onClick={() => disconnect()}>Logout</PrimaryButton>
       </ButtonContainer>
     </Container>
   )
