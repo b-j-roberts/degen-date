@@ -10,38 +10,9 @@ const StyledOption = styled(Row)`
   position: relative;
   width: 100%;
   border: 3px solid transparent;
-
-  &::before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: -4px;
-    bottom: -4px;
-    left: 8px;
-    right: 8px;
-    background: ${({ theme }) => theme.surface1};
-    z-index: 1;
-  }
-
-  &::after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 8px;
-    bottom: 8px;
-    left: -4px;
-    right: -4px;
-    background: ${({ theme }) => theme.surface1};
-    z-index: 1;
-  }
-
-  &:hover {
-    border-color: ${({ theme }) => theme.neutral1};
-  }
-
-  & > * {
-    z-index: 2;
-  }
+  background: ${({ theme }) => theme.surface2};
+  border-radius: 8px;
+  padding: 8px 16px;
 `
 
 interface OptionProps {
