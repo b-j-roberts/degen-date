@@ -14,14 +14,14 @@ func getCoinById(w http.ResponseWriter, r *http.Request) {
 
 	coinId := r.PathValue("id")
 
-	coinBasics, error := dbFunctions.PostgresQueryOne[CoinBasicDetails]("SELECT * FROM coins WHERE id = $1", coinId)
+	coinBasics, error := dbFunctions.PostgresQueryOne[CoinBasicDetails]("SELECT * FROM public.coins WHERE id = $1", coinId)
 
 	if error != nil {
 		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get coin of id "+coinId)
 		return
 	}
 
-	coinTradingDetails, error := dbFunctions.PostgresQueryOne[TradingDetails]("SELECT * FROM trading WHERE id = $1", coinId)
+	coinTradingDetails, error := dbFunctions.PostgresQueryOne[TradingDetails]("SELECT * FROM public.trading WHERE id = $1", coinId)
 
 	if error != nil {
 		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get coin of id "+coinId)
@@ -30,7 +30,7 @@ func getCoinById(w http.ResponseWriter, r *http.Request) {
 
 	coin := Coin{
 		Address:   coinBasics.Address,
-		Symbol:    coinBasics.Symbol,
+		Ticker:    coinBasics.Ticker,
 		Name:      coinBasics.Name,
 		Decimals:  coinBasics.Decimals,
 		ImageUrl:  coinBasics.ImageUrl,
@@ -51,8 +51,9 @@ func getCoinById(w http.ResponseWriter, r *http.Request) {
 func getCoinLineup(w http.ResponseWriter, r *http.Request) {
 	routeutils.SetupHeaders(w)
 
-	coins, error := dbFunctions.PostgresQueryJson[Coin]("SELECT address FROM coins")
-
+	coins, error := dbFunctions.PostgresQuery[CoinBasicDetails]("SELECT * FROM coins")
+	println(coins)
+	println(error)
 	if error != nil {
 		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get coin lineup")
 		return
@@ -62,7 +63,12 @@ func getCoinLineup(w http.ResponseWriter, r *http.Request) {
 		coins[i], coins[j] = coins[j], coins[i]
 	})
 
-	w.Write(coins)
+	resp, err := json.Marshal(coins)
+	if err != nil {
+		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get coin lineup")
+		return
+	}
+	w.Write(resp)
 }
 
 func addCoin(w http.ResponseWriter, r *http.Request) {

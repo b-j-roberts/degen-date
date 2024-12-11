@@ -1,5 +1,5 @@
 Api:
-  Port: 8080
+  Port: 8082
   AllowOrigins:
     - '*'
   AllowMethods:
