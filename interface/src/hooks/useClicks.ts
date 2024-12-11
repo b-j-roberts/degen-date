@@ -39,8 +39,6 @@ export default function useClicks(): UseClicksResult {
     ],
   }) as UseContractReadResult & { data?: [bigint, [bigint, bigint]] }
 
-  console.log(res)
-
   const data = useMemo(() => {
     if (!res.data) return undefined
 
