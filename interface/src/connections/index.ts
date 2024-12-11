@@ -2,9 +2,9 @@ import ARGENT_X_ICON from 'assets/argent-x.svg'
 import ARGENTMOBILE_ICON from 'assets/argentmobile.svg'
 import BRAAVOS_ICON from 'assets/braavos.svg'
 import WEBWALLET_ICON from 'assets/webwallet.svg'
-import { ArgentMobileConnector } from 'starknetkit/argentMobile'
-import { InjectedConnector } from 'starknetkit/injected'
-import { WebWalletConnector } from 'starknetkit/webwallet'
+import { ArgentMobileConnector } from 'starknetkit-next/argentMobile'
+import { InjectedConnector } from 'starknetkit-next/injected'
+import { WebWalletConnector } from 'starknetkit-next/webwallet'
 
 import { getShouldAdvertiseArgentX, getShouldAdvertiseBraavos } from './utils'
 
