@@ -229,7 +229,7 @@ func processMemecoinCreationEvent(event IndexerEvent) {
 	supply := event.Event.Data[4][2:] + event.Event.Data[3][2:]
 	address := event.Event.Data[5][2:]
 
-	_, err := db.Db.Postgres.Exec(context.Background(), "INSERT INTO MemeCoins ($1, $2, $3, $4, $5)", owner, name, symbol, supply, address)
+	_, err := db.Db.Postgres.Exec(context.Background(), "INSERT INTO MemeCoins (owner, name, symbol, supply, address) values ($1, $2, $3, $4, $5)", owner, name, symbol, supply, address)
 	if err != nil {
 		PrintIndexerError("processMemecoinCreationEvent", "error inserting new memecoin in postgres", err)
 		return
