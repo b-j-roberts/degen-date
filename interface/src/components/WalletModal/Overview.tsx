@@ -1,4 +1,3 @@
-import { useDisconnect, useNetwork } from '@starknet-react/core'
 import { SecondaryButton } from 'components/Button'
 import Portal from 'components/common/Portal'
 import Content from 'components/Modal/Content'
@@ -37,10 +36,12 @@ export function L2WalletOverviewModal() {
   const [isOpen] = useL2WalletOverviewModal()
 
   // disconnect
-  const { disconnect } = useDisconnect()
+  // TODO: const { disconnect } = useDisconnect()
+  const disconnect = () => console.log('TODO: disconnect')
 
   // chain infos
-  const { chain } = useNetwork()
+  // TODO: const { chain } = useNetwork()
+  const chain = { name: 'TODO: Sepolia' }
 
   if (!isOpen) return null
 
