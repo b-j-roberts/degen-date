@@ -1,0 +1,13 @@
+{
+  "redis": {
+    "host": "stonks-redis-1",
+    "port": 6379
+  },
+  "postgres": {
+    "host": "stonks-postgres-1",
+    "port": 5432,
+    "user": "stonks-user",
+    "database": "stonks-db"
+  }
+}
+
