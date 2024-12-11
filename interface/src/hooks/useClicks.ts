@@ -18,7 +18,7 @@ export default function useClicks(): UseClicksResult {
   const { address: accountAddress } = useAccount()
 
   const res = useContractRead({
-    blockIdentifier: BlockTag.pending,
+    blockIdentifier: BlockTag.PENDING,
     abi: compiledMulticall, // call is not send if abi is undefined
     address: accountAddress ? MULTICALL_ADDRESS : undefined,
     functionName: 'aggregate',

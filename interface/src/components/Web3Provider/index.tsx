@@ -1,7 +1,7 @@
 import { argent, braavos, StarknetConfig, starkscan, useInjectedConnectors } from '@starknet-react/core'
 import { junoRpcProviders, SUPPORTED_STARKNET_NETWORKS } from 'constants/networks'
-import { ArgentMobileConnector } from 'starknetkit/argentMobile'
-import { WebWalletConnector } from 'starknetkit/webwallet'
+import { ArgentMobileConnector } from 'starknetkit-next/argentMobile'
+import { WebWalletConnector } from 'starknetkit-next/webwallet'
 
 // STARKNET
 
@@ -23,7 +23,7 @@ export function StarknetProvider({ children }: StarknetProviderProps) {
 
   return (
     <StarknetConfig
-      connectors={connectors}
+      connectors={connectors as any}
       chains={SUPPORTED_STARKNET_NETWORKS}
       provider={junoRpcProviders}
       explorer={starkscan}
