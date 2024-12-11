@@ -1,8 +1,5 @@
 import { useAccount } from '@starknet-react/core'
-import Portal from 'components/common/Portal'
-import { Column } from 'components/Flex'
-import Content from 'components/Modal/Content'
-import Overlay from 'components/Modal/Overlay'
+import { Column, Row } from 'components/Flex'
 import { getL2Connections } from 'connections'
 import { useWalletConnectModal } from 'hooks/useModal'
 import { useEffect } from 'react'
@@ -10,13 +7,21 @@ import { styled } from 'styled-components'
 
 import { L2Option } from './Option'
 
+const StyledWalletConnect = styled(Row)`
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  bottom: 0;
+`
+
 const OptionsContainer = styled(Column)`
-  gap: 8px;
+  gap: 16px;
   width: 100%;
   align-items: flex-start;
 `
 
-function WalletConnectContent() {
+export default function WalletConnect() {
   // accounts
   const { address: l2Account } = useAccount()
 
@@ -34,7 +39,7 @@ function WalletConnectContent() {
   }, [toggle, l2Account])
 
   return (
-    <Content title="Connect Starknet wallet" close={toggle}>
+    <StyledWalletConnect>
       <OptionsContainer>
         {l2Connections
           .filter((connection) => connection.shouldDisplay())
@@ -42,21 +47,6 @@ function WalletConnectContent() {
             <L2Option key={connection.getName()} connection={connection} />
           ))}
       </OptionsContainer>
-    </Content>
-  )
-}
-
-export default function WalletConnectModal() {
-  // modal
-  const [isOpen, toggle] = useWalletConnectModal()
-
-  if (!isOpen) return null
-
-  return (
-    <Portal>
-      <WalletConnectContent />
-
-      <Overlay onClick={toggle} />
-    </Portal>
+    </StyledWalletConnect>
   )
 }
