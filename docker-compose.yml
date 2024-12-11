@@ -16,7 +16,7 @@ services:
       - 5432:5432
     volumes:
       - postgres:/var/lib/postgresql/data
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backend/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=degen-date-user
@@ -53,7 +53,7 @@ services:
       - backend
     environment:
       - AUTH_TOKEN=dna_placeholder
-      - APIBARA_STREAM_URL=http://https://sepolia.starknet.a5a.ch
+      - APIBARA_STREAM_URL=https://sepolia.starknet.a5a.ch
       - CONSUMER_TARGET_URL=http://degen-date-consumer-1:8081/consume-indexer-msg
       - PERSIST_TO_REDIS=redis://degen-date-redis-1:6379
       - INDEXER_ID=degen-date-indexer-id
