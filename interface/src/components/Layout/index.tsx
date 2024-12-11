@@ -1,9 +1,9 @@
-import Header from 'components/Header'
+import NavBar from 'components/NavBar'
 
 export default function Layout({ children }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <>
-      <Header />
+      <NavBar />
       {children}
     </>
   )

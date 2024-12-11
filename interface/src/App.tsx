@@ -1,14 +1,32 @@
 import Layout from 'components/Layout'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
-import HomePage from './pages/Home'
+import DashboardPage from './pages/Dashboard'
+import LaunchPage from './pages/Launch'
+import SwipePage from './pages/Swipe'
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: '/dashboard',
     element: (
       <Layout>
-        <HomePage />
+        <DashboardPage />
+      </Layout>
+    ),
+  },
+  {
+    path: '/swipe',
+    element: (
+      <Layout>
+        <SwipePage />
+      </Layout>
+    ),
+  },
+  {
+    path: '/launch',
+    element: (
+      <Layout>
+        <LaunchPage />
       </Layout>
     ),
   },

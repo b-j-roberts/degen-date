@@ -48,7 +48,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 export const ThemedGlobalStyle = createGlobalStyle`
   html {
     color: ${({ theme }) => theme.neutral1};
-    background-color: ${({ theme }) => theme.bg1} !important;
+    background-color: ${({ theme }) => theme.surface1} !important;
   }
 
   body {
