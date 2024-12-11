@@ -1,10 +1,8 @@
 import ARGENT_X_ICON from 'assets/argent-x.svg'
-import ARGENTMOBILE_ICON from 'assets/argentmobile.svg'
+// import ARGENTMOBILE_ICON from 'assets/argentmobile.svg'
 import BRAAVOS_ICON from 'assets/braavos.svg'
-import WEBWALLET_ICON from 'assets/webwallet.svg'
-import { ArgentMobileConnector } from 'starknetkit/argentMobile'
-import { InjectedConnector } from 'starknetkit/injected'
-import { WebWalletConnector } from 'starknetkit/webwallet'
+// import WEBWALLET_ICON from 'assets/webwallet.svg'
+import { InjectedConnector } from 'starknetkit-next/injected'
 
 import { getShouldAdvertiseArgentX, getShouldAdvertiseBraavos } from './utils'
 
@@ -17,7 +15,7 @@ enum ConnectionType {
 
 export interface L2Connection {
   getName(): string
-  connector: InjectedConnector | ArgentMobileConnector | WebWalletConnector
+  connector: any
   type: ConnectionType
   getIcon?(): string
   shouldDisplay(): boolean
@@ -68,6 +66,7 @@ const braavosWalletConnection: L2Connection = {
 
 // WEB WALLET
 
+/*
 const webWallet = new WebWalletConnector({ url: 'https://web.argent.xyz' })
 
 const webWalletConnection: L2Connection = {
@@ -77,9 +76,11 @@ const webWalletConnection: L2Connection = {
   getIcon: () => WEBWALLET_ICON,
   shouldDisplay: () => true,
 }
+*/
 
 // ARGENT MOBILE
 
+/*
 const argentMobile = new ArgentMobileConnector()
 
 const argentMobileConnection: L2Connection = {
@@ -89,9 +90,11 @@ const argentMobileConnection: L2Connection = {
   getIcon: () => ARGENTMOBILE_ICON,
   shouldDisplay: () => true,
 }
+*/
 
 // GETTERS
 
 export function getL2Connections() {
-  return [argentXWalletConnection, argentMobileConnection, braavosWalletConnection, webWalletConnection]
+  // return [argentXWalletConnection, argentMobileConnection, braavosWalletConnection, webWalletConnection]
+  return [argentXWalletConnection, braavosWalletConnection]
 }

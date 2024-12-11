@@ -1,4 +1,3 @@
-import { useConnect } from '@starknet-react/core'
 import { Row } from 'components/Flex'
 import { Connection, L2Connection } from 'connections'
 import { styled } from 'styled-components'
@@ -35,8 +34,7 @@ interface L2OptionProps {
 
 export function L2Option({ connection }: L2OptionProps) {
   // wallet activation
-  const { connect } = useConnect()
-  const activate = () => connect({ connector: connection.connector })
+  const activate = () => console.log('TODO')
 
   return <Option connection={connection} activate={activate} />
 }

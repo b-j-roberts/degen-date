@@ -1,6 +1,6 @@
-import { useAccount } from '@starknet-react/core'
 import { Column, Row } from 'components/Flex'
 import { getL2Connections } from 'connections'
+import { useAccount } from 'hooks/useAccount'
 import { useWalletConnectModal } from 'hooks/useModal'
 import { useEffect } from 'react'
 import { styled } from 'styled-components'
@@ -22,10 +22,8 @@ const OptionsContainer = styled(Column)`
 `
 
 export default function WalletConnect() {
-  // accounts
-  const { address: l2Account } = useAccount()
-
   // connections
+  const { account: l2Account } = useAccount()
   const l2Connections = getL2Connections()
 
   // modal
