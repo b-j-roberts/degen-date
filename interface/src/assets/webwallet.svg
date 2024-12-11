@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="b" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" width="66" height="66" viewBox="0 0 66 66">
+  <path d="M60,12H0v42h66V12h-6ZM60,24v24H6v-30h6v6h6v-6h30v6h6v-6h6v6Z" fill="#fff" fill-rule="evenodd" stroke-width="0"/>
+  <rect x="42" y="24" width="6" height="6" fill="#fff" stroke-width="0"/>
+  <rect x="36" y="30" width="6" height="6" fill="#fff" stroke-width="0"/>
+  <rect x="30" y="36" width="6" height="6" fill="#fff" stroke-width="0"/>
+  <rect x="24" y="30" width="6" height="6" fill="#fff" stroke-width="0"/>
+  <rect x="18" y="24" width="6" height="6" fill="#fff" stroke-width="0"/>
+</svg>
