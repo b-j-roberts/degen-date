@@ -11,18 +11,19 @@ import (
 )
 
 func main() {
-  config.InitConfig()
+	config.InitConfig()
 
-  db.InitDB()
-  defer db.CloseDB()
+	db.InitDB()
+	defer db.CloseDB()
 
 	routes.InitRoutes()
 	indexer.InitIndexerRoutes()
 	indexer.StartMessageProcessor()
 
-  fmt.Println("Listening on port:", config.Conf.Consumer.Port)
-  http.ListenAndServe(fmt.Sprintf(":%d", config.Conf.Consumer.Port), nil)
-  fmt.Println("Server stopped")
-
+	fmt.Println("Listening on port:", config.Conf.Consumer.Port)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", config.Conf.Consumer.Port), nil)
+	if err != nil {
+		fmt.Println("Error lisn and serve")
+	}
+	fmt.Println("Server stopped")
 }
-

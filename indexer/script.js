@@ -28,7 +28,7 @@ export const config = {
   },
   sinkType: "webhook",
   sinkOptions: {
-    targetUrl: "http://localhost:8081/consume-indexer-msg"
+    targetUrl: "http://degen-date-consumer-1:8081/consume-indexer-msg"
   }
 };
 

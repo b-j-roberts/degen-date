@@ -45,6 +45,11 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=password
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8081"]
+        interval: 5s
+        timeout: 20s
+        retries: 5
   indexer:
     build:
       dockerfile: indexer/Dockerfile
@@ -52,14 +57,16 @@ services:
     links:
       - backend
     environment:
-      - AUTH_TOKEN=dna_placeholder
-      - APIBARA_STREAM_URL=https://sepolia.starknet.a5a.ch
+      - APIBARA_STREAM_URL=http://https://sepolia.starknet.a5a.ch
+      - AUTH_TOKEN=dna_4LKA9wQqELJnQOm8xb5y
       - CONSUMER_TARGET_URL=http://degen-date-consumer-1:8081/consume-indexer-msg
       - PERSIST_TO_REDIS=redis://degen-date-redis-1:6379
       - INDEXER_ID=degen-date-indexer-id
     volumes:
       - configs:/configs
     restart: on-failure
+    depends_on:
+      - consumer
   frontend:
     build:
       dockerfile: interface/Dockerfile
