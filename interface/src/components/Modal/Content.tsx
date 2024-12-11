@@ -6,7 +6,7 @@ import { ThemedText } from 'theme/components'
 const StyledContent = styled.div`
   border: 3px solid ${({ theme }) => theme.neutral1};
   padding: 80px 32px;
-  background: ${({ theme }) => theme.bg1};
+  background: ${({ theme }) => theme.surface1};
   z-index: 1060;
   position: fixed;
   width: 100%;
@@ -63,7 +63,7 @@ const CloseContainer = styled.div`
 
   &:hover {
     background: ${({ theme }) => theme.neutral1};
-    color: ${({ theme }) => theme.bg1};
+    color: ${({ theme }) => theme.surface1};
   }
 `
 

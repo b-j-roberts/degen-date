@@ -5,7 +5,6 @@ import WEBWALLET_ICON from 'assets/webwallet.svg'
 import { ArgentMobileConnector } from 'starknetkit/argentMobile'
 import { InjectedConnector } from 'starknetkit/injected'
 import { WebWalletConnector } from 'starknetkit/webwallet'
-import { isMobile } from 'utils/userAgent'
 
 import { getShouldAdvertiseArgentX, getShouldAdvertiseBraavos } from './utils'
 
@@ -36,7 +35,7 @@ const argentXWalletConnection: L2Connection = {
   connector: starknetArgentXWallet,
   type: ConnectionType.ARGENT_X,
   getIcon: () => ARGENT_X_ICON,
-  shouldDisplay: () => Boolean(!isMobile),
+  shouldDisplay: () => true,
   // If on non-injected, non-mobile browser, prompt user to install ArgentX
   overrideActivate: () => {
     if (getShouldAdvertiseArgentX()) {
@@ -72,7 +71,7 @@ const braavosWalletConnection: L2Connection = {
 const webWallet = new WebWalletConnector({ url: 'https://web.argent.xyz' })
 
 const webWalletConnection: L2Connection = {
-  getName: () => 'Web Wallet',
+  getName: () => 'Argent Web Wallet',
   connector: webWallet,
   type: ConnectionType.WEBWALLET,
   getIcon: () => WEBWALLET_ICON,
@@ -94,5 +93,5 @@ const argentMobileConnection: L2Connection = {
 // GETTERS
 
 export function getL2Connections() {
-  return [argentXWalletConnection, braavosWalletConnection, webWalletConnection, argentMobileConnection]
+  return [argentXWalletConnection, argentMobileConnection, braavosWalletConnection, webWalletConnection]
 }

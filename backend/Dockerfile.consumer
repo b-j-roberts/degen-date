@@ -13,8 +13,8 @@ RUN go mod download
 COPY ./backend .
 
 # Build the app & run it
-RUN go build -o degen-date-api ./cmd/degen-date-api/main.go
+RUN go build -o consumer ./cmd/consumer/main.go
 
-EXPOSE 8080
+EXPOSE 8081
 
-CMD ["./degen-date-api"]
+CMD ["./consumer"]

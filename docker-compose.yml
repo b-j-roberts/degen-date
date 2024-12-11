@@ -45,41 +45,14 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=password
-  apibara:
-    image: quay.io/apibara/starknet:1.5.0
-    command:
-      - start
-      - --rpc=http://devnet:5050/rpc
-      - --name=devnet
-      - --head-refresh-interval-ms=1000
-      - --wait-for-rpc
-      - --address=0.0.0.0:7171
-    environment:
-      - XDG_DATA_HOME=/data
-    volumes:
-      - apibara:/data
-    ports:
-      - 7171:7171
-    links:
-      - backend
-      - devnet
-    depends_on:
-      devnet:
-        condition: service_started
   indexer:
     build:
       dockerfile: indexer/Dockerfile
       context: .
-    depends_on:
-      deployer:
-        condition: service_completed_successfully
-      apibara:
-        condition: service_started
     links:
       - backend
-      - apibara
     environment:
-      - APIBARA_STREAM_URL=http://degen-date-apibara-1:7171
+      - APIBARA_STREAM_URL=http://https://sepolia.starknet.a5a.ch
       - CONSUMER_TARGET_URL=http://degen-date-consumer-1:8081/consume-indexer-msg
       - PERSIST_TO_REDIS=redis://degen-date-redis-1:6379
       - INDEXER_ID=degen-date-indexer-id
@@ -88,21 +61,17 @@ services:
     restart: on-failure
   frontend:
     build:
-      dockerfile: frontend/Dockerfile
+      dockerfile: interface/Dockerfile
       context: .
-    depends_on:
-      deployer:
-        condition: service_completed_successfully
     ports:
       - 3001:3001
     links:
       - backend
     volumes:
-      - ./frontend/package.json:/app/package.json
-      - ./frontend/package-lock.json:/app/package-lock.json
-      - ./frontend/public/:/app/public
-      - ./frontend/src:/app/src
-      - configs:/app/src/configs
+      - ./interface/package.json:/app/package.json
+      - ./interface/yarn.lock:/app/yarn.lock
+      - ./interface/public/:/app/public
+      - ./interface/src:/app/src
 
 volumes:
   redis:
