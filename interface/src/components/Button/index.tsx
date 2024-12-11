@@ -2,7 +2,7 @@ import { styled } from 'styled-components'
 
 export const SecondaryButton = styled.button`
   font-size: 20px;
-  color: ${({ theme }) => theme.bg1};
+  color: ${({ theme }) => theme.surface1};
   background: ${({ theme }) => theme.neutral1};
   cursor: pointer;
   position: relative;

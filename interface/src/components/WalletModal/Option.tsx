@@ -19,7 +19,7 @@ const StyledOption = styled(Row)`
     bottom: -4px;
     left: 8px;
     right: 8px;
-    background: ${({ theme }) => theme.bg1};
+    background: ${({ theme }) => theme.surface1};
     z-index: 1;
   }
 
@@ -31,7 +31,7 @@ const StyledOption = styled(Row)`
     bottom: 8px;
     left: -4px;
     right: -4px;
-    background: ${({ theme }) => theme.bg1};
+    background: ${({ theme }) => theme.surface1};
     z-index: 1;
   }
 

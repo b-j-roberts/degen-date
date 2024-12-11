@@ -6,8 +6,10 @@ const colors = {
 
   error_dark: '#ff0030',
 
-  neutral1_dark: '#f7f7f7',
-  accent1_dark: '#e1e71d',
+  neutral1_dark: '#ffffff',
+  neutral2_dark: '#9B9B9B',
+
+  accent1_dark: '#b387ca',
 }
 
 const commonTheme = {
@@ -18,10 +20,13 @@ const commonTheme = {
 export const darkTheme = {
   ...commonTheme,
 
-  bg1: '#0b0d0f',
-  bg2: '#1c2127',
+  surface1: '#09080D',
+  surface2: '#111113',
 
   neutral1: colors.neutral1_dark,
+  neutral2: colors.neutral2_dark,
+
   error: colors.error_dark,
+
   accent1: colors.accent1_dark,
 }
