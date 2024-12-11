@@ -1,30 +1,22 @@
+const MEMECOIN_LAUNCHED_EVENT_KEY = "0x0257c7875ae0eb2f487e258997d033dde6441d55296281bc727bc1e64b833cfd"
+const UNRUGGABLE_CONTRACT_ADDRESS = "0x494a72a742b7880725a965ee487d937fa6d08a94ba4eb9e29dd0663bc653a2"
+
 export const config = {
-  streamUrl: Deno.env.get("APIBARA_STREAM_URL"),
-  startingBlock: 0,
+  streamUrl: "https://sepolia.starknet.a5a.ch",
+  startingBlock: 381350,
   network: "starknet",
   finality: "DATA_STATUS_PENDING",
   filter: {
     events: [
       {
-        // New Stonk Event
-        fromAddress: Deno.env.get("STONKS_CONTRACT_ADDRESS"),
+        fromAddress: UNRUGGABLE_CONTRACT_ADDRESS,
         keys: [
-          "0x03755b6d3f48992af15de25f545ee92c3cb4205c6b24d1aa65d93701bc3d63f9"
+          MEMECOIN_LAUNCHED_EVENT_KEY 
         ],
         includeReverted: false,
         includeTransaction: false,
         includeReceipt: false
       },
-      {
-        // Stonk Claimed Event
-        fromAddress: Deno.env.get("STONKS_CONTRACT_ADDRESS"),
-        keys: [
-          "0x00e6009859f4b71dc66d2c774b2dc0852fce0cc94eb683969fdd8da1a07788fc"
-        ],
-        includeReverted: false,
-        includeTransaction: false,
-        includeReceipt: false
-      }
     ]
   },
   sinkType: "webhook",
