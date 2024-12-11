@@ -3,17 +3,7 @@ import { createGlobalStyle, ThemeProvider as StyledComponentsThemeProvider } fro
 
 import { darkTheme } from './colors'
 
-const MAX_CONTENT_WIDTH = '720px'
-
-const BREAKPOINTS = {
-  xs: 480,
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
-  xxl: 1536,
-  xxxl: 1920,
-}
+const NAV_BAR_HEIGHT = 64
 
 const opacities = {
   hover: 0.6,
@@ -24,11 +14,9 @@ const opacities = {
 
 function getSettings() {
   return {
-    maxWidth: MAX_CONTENT_WIDTH,
+    navBarHeight: NAV_BAR_HEIGHT,
 
     opacity: opacities,
-
-    breakpoint: BREAKPOINTS,
   }
 }
 

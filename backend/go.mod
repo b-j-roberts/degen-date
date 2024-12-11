@@ -6,6 +6,7 @@ require (
 	github.com/georgysavva/scany/v2 v2.1.3
 	github.com/jackc/pgx/v5 v5.7.1
 	gopkg.in/yaml.v3 v3.0.1
+	github.com/holiman/uint256 v1.3.2
 )
 
 require (

@@ -9,7 +9,7 @@ const colors = {
   neutral1_dark: '#ffffff',
   neutral2_dark: '#9B9B9B',
 
-  accent1_dark: '#b387ca',
+  accent1_dark: '#6321F2',
 }
 
 const commonTheme = {
@@ -22,6 +22,7 @@ export const darkTheme = {
 
   surface1: '#09080D',
   surface2: '#111113',
+  surface3: '#2D2D2F',
 
   neutral1: colors.neutral1_dark,
   neutral2: colors.neutral2_dark,

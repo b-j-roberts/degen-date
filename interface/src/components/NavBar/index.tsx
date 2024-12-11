@@ -13,7 +13,7 @@ const StyledNavBar = styled(Row)`
   right: 0;
   background: ${({ theme }) => theme.surface2};
   border-radius: 16px 16px 0 0;
-  height: 64px;
+  height: ${({ theme }) => theme.navBarHeight}px;
 `
 
 const NavLink = styled(ActiveLink)`
