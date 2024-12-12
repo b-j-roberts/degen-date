@@ -134,7 +134,7 @@ export default function SwipePage() {
   const metrics = useMemo(
     () => {
       const mcap = (getRandomInt(100_000) + 4) * 1_000
-      const holders = (getRandomInt(5) * mcap) / 800
+      const holders = ((getRandomInt(5) + 1) * mcap) / 1269
 
       return {
         chart: getRandomChart(),
@@ -248,6 +248,8 @@ export default function SwipePage() {
   if (!currentMemecoin) {
     return null
   }
+
+  console.log(currentMemecoin)
 
   return (
     <Container>
