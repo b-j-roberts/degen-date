@@ -2,6 +2,7 @@ import { useDisconnect } from '@starknet-react/core'
 import { CircleButton, PrimaryButton, SecondaryButton } from 'components/Button'
 import { Column, Row } from 'components/Flex'
 import { ActiveLink } from 'components/Link/ActiveLink'
+import { useBoundStore } from 'state'
 import styled from 'styled-components'
 import { ThemedText } from 'theme/components'
 
@@ -72,35 +73,13 @@ const NavLink = styled(ActiveLink)`
 `
 
 export default function DashboardPage() {
-  const assets = [
-    {
-      name: 'Starknet Brother',
-      ticker: 'BROTHER',
-      balance: 120.0,
-      conversion: 0.123,
-    },
-    {
-      name: 'Safe Token 100',
-      ticker: 'SAFE',
-      balance: 42000.0,
-      conversion: 0.01,
-    },
-    {
-      name: 'CatsCatsCats',
-      ticker: 'CATS',
-      balance: 100000.0,
-      conversion: 0.00001,
-    },
-    {
-      name: 'To The Moon',
-      ticker: 'TTM',
-      balance: 10000000,
-      conversion: 0.0004,
-    },
-  ]
+  const assets = useBoundStore((state) => state.tokens)
 
-  function balance(amount: any) {
-    return Number.parseFloat(amount).toFixed(2)
+  function balance(amount: number) {
+    if(amount > 1000000) {
+      return (amount / 1000000).toFixed(2) + "M"
+    }
+    return amount
   }
 
   const { disconnect } = useDisconnect()
