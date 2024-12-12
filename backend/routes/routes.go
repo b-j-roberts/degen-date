@@ -1,12 +1,9 @@
 package routes
 
 import (
-	"encoding/json"
 	"fmt"
 	"image"
 	"image/png"
-	"math/rand"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -74,9 +71,6 @@ func InitRoutes() {
 		routeutils.SetupHeaders(w)
 		w.WriteHeader(http.StatusOK)
 	})
-	http.HandleFunc("/coin", addCoin)
-	http.HandleFunc("/coin/{id}", getCoinById)
-	http.HandleFunc("/lineup", getCoinLineup)
   http.HandleFunc("/upload-memecoin-image", uploadMemecoinImage)
   http.Handle("/memecoins/", http.StripPrefix("/memecoins/", http.FileServer(http.Dir("./memecoins"))))
 	http.HandleFunc("/get_memecoins", getMemeCoins)
