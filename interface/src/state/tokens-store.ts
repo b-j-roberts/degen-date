@@ -1,5 +1,6 @@
 import "immer";
-import { create } from "zustand";
+import { StoreState } from "state";
+import { create, StateCreator } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
 export type Token = {
@@ -23,16 +24,18 @@ const initialState: State = {
   tokens: [],
 };
 
-export const useBoughtTokensStore = create<
-  State & Actions,
-  [["zustand/immer", never]]
->(
-  immer((set) => ({
-    ...initialState,
-    addToken: (token: Token) =>
-      set((state) => {
-        state.tokens.push(token);
-      }),
-    clearTokens: () => set({ tokens: [] }),
-  }))
-);
+export type TokensSlice = State & Actions;
+
+export const useBoughtTokensStore: StateCreator<
+  StoreState,
+  [["zustand/immer", never]],
+  [],
+  TokensSlice
+> = (set) => ({
+  ...initialState,
+  addToken: (token: Token) =>
+    set((state) => {
+      state.tokens.push(token);
+    }),
+  clearTokens: () => set({ tokens: [] }),
+});
