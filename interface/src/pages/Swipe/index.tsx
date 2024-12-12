@@ -3,15 +3,13 @@ import { Column, Row } from 'components/Flex'
 import useScreenSize from 'hooks/useScreenSize'
 import { useEffect, useMemo, useState } from 'react'
 import { useDrag } from 'react-use-gesture'
-import { shortString } from 'starknet'
+import { num, shortString } from 'starknet'
 import styled from 'styled-components'
 import { ThemedText } from 'theme/components'
 import { formatWithAbbreviation } from 'utils/format'
 import { getRandomChart, getRandomInt, shuffleArray } from 'utils/random'
 
-import { Memecoin } from './types'
-
-import { SwipeContainer } from './SwipeContainer'
+import { Memecoin, RawMemecoin } from './types'
 
 const Container = styled(Column)`
   padding: 24px 24px 0;
@@ -69,14 +67,14 @@ const StatsContainer = styled(Row)`
   position: relative;
 `
 
-const Chart = styled.div<{ width: number; link: string; up: boolean }>`
+const Chart = styled.div<{ width: number; link: string; $up: boolean }>`
   width: 100%;
   background-image: url(${({ link }) => link});
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  filter: ${({ up }) =>
-    up
+  filter: ${({ $up }) =>
+    $up
       ? 'brightness(0) saturate(100%) invert(49%) sepia(82%) saturate(3530%) hue-rotate(87deg) brightness(119%) contrast(95%)'
       : 'brightness(0) saturate(100%) invert(15%) sepia(92%) saturate(6449%) hue-rotate(359deg) brightness(108%) contrast(114%)'};
   transform: scaleX(1.27);
@@ -112,6 +110,7 @@ export default function SwipePage() {
   const [memecoins, setMemecoins] = useState<Memecoin[]>([])
   const [shouldFetch, setShouldFetch] = useState(true)
   const [amount, setAmount] = useState(0)
+  const [imagesPreloaded, setImagesPreloaded] = useState(false)
 
   // fetch memecoins
   useEffect(() => {
@@ -121,7 +120,13 @@ export default function SwipePage() {
       fetch('http://localhost:8080/get_memecoins')
         .then((response) => response.json())
         .then((res) => {
-          setMemecoins(shuffleArray(res?.data ?? []))
+          setMemecoins(
+            shuffleArray(res?.data ?? []).map((memecoin: RawMemecoin) => ({
+              name: shortString.decodeShortString(num.toBigInt(`0x${memecoin.name}`).toString()),
+              symbol: `$${shortString.decodeShortString(num.toBigInt(`0x${memecoin.symbol}`).toString())}`,
+              imageUrl: `https://starkware-internal-hackathon-team-16.s3.eu-north-1.amazonaws.com/0x${memecoin.address}.png`,
+            }))
+          )
         })
     }
   }, [shouldFetch])
@@ -133,8 +138,8 @@ export default function SwipePage() {
 
       return {
         chart: getRandomChart(),
-        mcap: formatWithAbbreviation(mcap, 0),
-        holders: formatWithAbbreviation(holders, 0),
+        mcap: formatWithAbbreviation(mcap, 1),
+        holders: formatWithAbbreviation(holders, 1),
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -210,25 +215,39 @@ export default function SwipePage() {
   })
 
   // current memecoin
-  const currentMemecoin = useMemo(() => {
-    const memecoin = memecoins[memecoinIndex]
+  const currentMemecoin = memecoins[memecoinIndex]
 
-    if (!memecoin) {
-      return null
+  // preload images
+  useEffect(() => {
+    if (imagesPreloaded || !memecoins.length) {
+      return
     }
 
-    return {
-      name: shortString.decodeShortString(`0x${memecoin.name}`),
-      symbol: `$${shortString.decodeShortString(`0x${memecoin.symbol}`)}`,
-      imageUrl: `http://localhost:8080/memecoins/0x${memecoin.address}.png`,
+    // Method 1: Using Image object
+    const preloadImages = () => {
+      const imagePromises = memecoins.map((memecoin) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image()
+          img.src = memecoin.imageUrl
+          img.onload = resolve
+          img.onerror = reject
+        })
+      })
+
+      Promise.all(imagePromises)
+        .then(() => {
+          console.log('Images preloaded')
+          setImagesPreloaded(true)
+        })
+        .catch((err) => console.error('Error preloading images:', err))
     }
-  }, [memecoinIndex, memecoins])
+
+    preloadImages()
+  }, [memecoins, imagesPreloaded])
 
   if (!currentMemecoin) {
     return null
   }
-
-  console.log(currentMemecoin.imageUrl)
 
   return (
     <Container>
@@ -241,8 +260,8 @@ export default function SwipePage() {
           <Veil />
 
           <InfosContainer>
-            <ThemedText.HeadlineMedium dangerouslySetInnerHTML={{ __html: currentMemecoin.name }} />
-            <ThemedText.BodySecondary dangerouslySetInnerHTML={{ __html: currentMemecoin.symbol }} />
+            <ThemedText.HeadlineMedium>{currentMemecoin.name}</ThemedText.HeadlineMedium>
+            <ThemedText.BodySecondary>{currentMemecoin.symbol}</ThemedText.BodySecondary>
           </InfosContainer>
         </AnimatedTokenCard>
       </TokenCardContainer>
@@ -269,7 +288,7 @@ export default function SwipePage() {
         </AnimatedAmountContainer>
       </StatsContainer>
 
-      <Chart width={width} {...metrics.chart} />
+      <Chart width={width} $up={metrics.chart.up} link={metrics.chart.link} />
     </Container>
   )
 }

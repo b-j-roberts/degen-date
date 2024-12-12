@@ -275,7 +275,7 @@ export default function LaunchPage() {
       <ButtonContainer>
         {loading ? (
           <Spinner size={48} />
-        ) : !success ? (
+        ) : success ? (
           <Check size={96} color={theme.accent1} />
         ) : (
           <PrimaryButton onClick={launch} disabled={!canLaunch}>
