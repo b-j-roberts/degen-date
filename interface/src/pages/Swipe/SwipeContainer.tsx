@@ -6,7 +6,7 @@ const Container = styled(Column)`
   padding: 24px 24px 0;
   width: 100%;
   height: 100%;
-  // overflow: hidden;
+  overflow: hidden;
 `;
 
 type SwipeContainerProps = {
