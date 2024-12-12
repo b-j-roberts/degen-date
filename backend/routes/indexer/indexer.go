@@ -1,11 +1,13 @@
 package indexer
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/b-j-roberts/degen-date/backend/internal/db"
 	routeutils "github.com/b-j-roberts/degen-date/backend/routes/utils"
 )
 
@@ -214,33 +216,68 @@ const (
 const UNRUGGABLE_CONTRACT_ADDRESS = "0x00494a72a742b7880725a965ee487d937fa6d08a94ba4eb9e29dd0663bc653a2"
 
 func processMemecoinCreationEvent(event IndexerEvent) {
-	fmt.Printf("event memcoin created: %+v\n", event)
-
 	if event.Event.FromAddress != UNRUGGABLE_CONTRACT_ADDRESS {
 		PrintIndexerError("processMemecoinCreationEvent", "event from unsuported contract", event.Event.FromAddress)
 		return
 	}
 
-	// owner := event.Event.Data[0]
-	// name := event.Event.Data[1]
-	// symbol := event.Event.Data[2]
-	// supply, err := u256.FromHex(event.Event.Data[4] + event.Event.Data[3][2:])
-	// if err != nil {
-	// 	PrintIndexerError("processMemecoinCreationEvent", "error parsing supply", err, event.Event.Data[4], event.Event.Data[3])
-	// 	return
-	// }
-	// memecoin_address := event.Event.Data[5]
+	owner := event.Event.Data[0][2:]
+	name := event.Event.Data[1][2:]
+	symbol := event.Event.Data[2][2:]
+	supply := event.Event.Data[4][2:] + event.Event.Data[3][2:]
+	address := event.Event.Data[5][2:]
+
+	_, err := db.Db.Postgres.Exec(context.Background(), "INSERT INTO MemeCoins (owner, name, symbol, supply, address) values ($1, $2, $3, $4, $5)", owner, name, symbol, supply, address)
+	if err != nil {
+		PrintIndexerError("processMemecoinCreationEvent", "error inserting new memecoin in postgres", err)
+		return
+	}
+
 }
 
 func revertMemecoinCreationEvent(event IndexerEvent) {
-	// Do nothing we don't care about that one
+	if event.Event.FromAddress != UNRUGGABLE_CONTRACT_ADDRESS {
+		PrintIndexerError("processMemecoinCreationEvent", "event from unsuported contract", event.Event.FromAddress)
+		return
+	}
+
+	address := event.Event.Data[5][2:]
+	_, err := db.Db.Postgres.Exec(context.Background(), "DELETE FROM MemeCoins WHERE address = $1", address)
+	if err != nil {
+		PrintIndexerError("revertMemecoinCreationEvent", "error reverting new memecoin in postgres", err, address)
+		return
+	}
+
 }
 
 func processMemecoinLaunchEvent(event IndexerEvent) {
+	if event.Event.FromAddress != UNRUGGABLE_CONTRACT_ADDRESS {
+		PrintIndexerError("processMemecoinCreationEvent", "event from unsuported contract", event.Event.FromAddress)
+		return
+	}
+
+	address := event.Event.Data[0][2:]
+	quote_token := event.Event.Data[1][2:]
+	exchange_name := event.Event.Data[2][2:]
+	_, err := db.Db.Postgres.Exec(context.Background(), "UPDATE MemeCoins SET (launched, quote_token, exchange_name) = (TRUE, $1, $2) WHERE address = $3", quote_token, exchange_name, address)
+	if err != nil {
+		PrintIndexerError("processMemecoinLaunchEvent", "error updating launched memecoin in postgres", err)
+		return
+	}
 }
 
 func revertMemecoinLaunchEvent(event IndexerEvent) {
-	// todo
+	if event.Event.FromAddress != UNRUGGABLE_CONTRACT_ADDRESS {
+		PrintIndexerError("processMemecoinCreationEvent", "event from unsuported contract", event.Event.FromAddress)
+		return
+	}
+
+	address := event.Event.Data[0][2:]
+	_, err := db.Db.Postgres.Exec(context.Background(), "UPDATE MemeCoins SET (launched, quote_token, exchange_name) = (FALSE, NULL, NULL) WHERE address = $1", address)
+	if err != nil {
+		PrintIndexerError("revertMemecoinLaunchEvent", "error reverting launched memecoin in postgres", err)
+		return
+	}
 }
 
 var eventProcessors = map[string](func(IndexerEvent)){

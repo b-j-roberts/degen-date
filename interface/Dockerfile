@@ -7,6 +7,8 @@ COPY ./interface/package.json ./interface/yarn.lock ./
 RUN yarn
 COPY ./interface ./
 
+EXPOSE 3000
+
 SHELL ["/bin/bash", "-c"]
 # Clear the entrypoint
 ENTRYPOINT []

@@ -18,7 +18,16 @@ export const config = {
       {
         fromAddress: UNRUGGABLE_CONTRACT_ADDRESS,
         keys: [
-          MEMECOIN_CREATED_EVENT_KEY 
+          MEMECOIN_CREATED_EVENT_KEY,
+        ],
+        includeReverted: false,
+        includeTransaction: true,
+        includeReceipt: false
+      },
+      {
+        fromAddress: UNRUGGABLE_CONTRACT_ADDRESS,
+        keys: [
+          MEMECOIN_LAUNCHED_EVENT_KEY,
         ],
         includeReverted: false,
         includeTransaction: true,
@@ -28,7 +37,7 @@ export const config = {
   },
   sinkType: "webhook",
   sinkOptions: {
-    targetUrl: "http://localhost:8081/consume-indexer-msg"
+    targetUrl: "http://degen-date-consumer-1:8081/consume-indexer-msg"
   }
 };
 
