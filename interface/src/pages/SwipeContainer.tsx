@@ -25,7 +25,6 @@ export const SwipeContainer = ({
 }: SwipeContainerProps) => {
   const screenWith = window.innerWidth;
   const screenHight = window.innerHeight;
-  console.log(screenWith, screenHight);
   const [position, setPosition] = useState({x: 170, y: 190});
   const [dragging, setDragging] = useState(false);
   const [offset, setOffset] = useState({x: 0, y: 0});
@@ -51,19 +50,11 @@ export const SwipeContainer = ({
 
   const handleTouchUp = () => {
     setDragging(false);
-    if (offset.y < (screenHight * 3) / 4 && offset.y > screenHight / 4) {
-      if (offset.x < screenWith /2 ) {
+    if (position.x > 270 ) {
         swipeRightCallback?.();
-      } else if (offset.x > (screenWith * 3) / 4) {
+      } else if (position.x < 100) {
         swipeLeftCallback?.();
       }
-    } else {
-      if (offset.y < screenHight / 2) {
-        swipeUpCallback?.();
-      } else if (offset.y > (screenHight * 3) / 4) {
-        swipeDownCallback?.();
-      }
-    }
 
     setPosition({x: 170, y: 190});
   };
