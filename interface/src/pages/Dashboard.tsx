@@ -76,8 +76,8 @@ export default function DashboardPage() {
   const assets = useBoundStore((state) => state.tokens)
 
   function balance(amount: number) {
-    if(amount > 1000000) {
-      return (amount / 1000000).toFixed(2) + "M"
+    if (amount > 1000000) {
+      return (amount / 1000000).toFixed(2) + 'M'
     }
     return amount
   }
