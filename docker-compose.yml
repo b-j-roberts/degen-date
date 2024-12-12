@@ -34,7 +34,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
     volumes:
-      - memecoins:/app/memecoins
+      - ./memecoins:/app/memecoins
   consumer:
     build:
       dockerfile: backend/Dockerfile.consumer
@@ -88,4 +88,3 @@ volumes:
   postgres:
   apibara:
   configs:
-  memecoins:
