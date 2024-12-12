@@ -12,15 +12,6 @@ const Container = styled(Column)`
   height: 100%;
 `
 
-const DashboardHeader = styled(Row)`
-  border-bottom: 2px solid #ffffff80;
-  justify-content: space-between;
-  font-size: 18px;
-  width: 100%;
-  padding: 0;
-  justify-content: center;
-`
-
 const DashboardInfo = styled(Column)`
   position: relative;
   padding: 16px 20px;
