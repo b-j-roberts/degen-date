@@ -40,7 +40,7 @@ const initialState: State = {
     },
     {
       name: 'To The Moon',
-      ticker:'TTM',
+      ticker: 'TTM',
       balance: 10000000000,
       conversion: 0.0004,
     },
@@ -49,16 +49,13 @@ const initialState: State = {
 
 export type TokensSlice = State & Actions
 
-export const createTokensSlice: StateCreator<
-  StoreState,
-  [['zustand/immer', never]],
-  [],
-  TokensSlice
-> = immer((set) => ({
-  ...initialState,
-  addToken: (token: Token) =>
-    set((state: any) => {
-      state.tokens.push(token);
-    }),
-  clearTokens: () => set({ tokens: [] }),
-}));
+export const createTokensSlice: StateCreator<StoreState, [['zustand/immer', never]], [], TokensSlice> = immer(
+  (set) => ({
+    ...initialState,
+    addToken: (token: Token) =>
+      set((state: any) => {
+        state.tokens.push(token)
+      }),
+    clearTokens: () => set({ tokens: [] }),
+  })
+)
