@@ -1,15 +1,15 @@
 import { useAccount, useContractWrite } from '@starknet-react/core'
-import axios from 'axios'
+import AWS from 'aws-sdk'
 import { PrimaryButton } from 'components/Button'
 import { Column, Row } from 'components/Flex'
 import Input from 'components/Input'
 import { MEMECOIN_CLASS_HASH, STRK_ADDRESS, UNRUG_FACTORY_ADDRESS } from 'constants/contracts'
 import { DEFAULT_SUPPLY, Entrypoint } from 'constants/misc'
 import { useAtom } from 'jotai'
-import { Pencil, Rocket } from 'lucide-react'
-import { useCallback, useMemo, useRef } from 'react'
+import { Check, LoaderCircle, Pencil, Rocket } from 'lucide-react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { CallData, hash, shortString, stark, uint256 } from 'starknet'
-import styled from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 import { ThemedText } from 'theme/components'
 
 import { formFieldsAtom } from './atom'
@@ -109,9 +109,25 @@ const InputsContainer = styled.div`
   z-index: 1;
 `
 
+const Spinner = styled(LoaderCircle)`
+  color: ${({ theme }) => theme.accent1};
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`
+
 export default function LaunchPage() {
   const [formFields, setFormFields] = useAtom(formFieldsAtom)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+
+  // theme
+  const theme = useTheme()
 
   // text inputs
   const onUserInput = useCallback(
@@ -156,9 +172,11 @@ export default function LaunchPage() {
   const { address } = useAccount()
   const { writeAsync, isPending } = useContractWrite({})
   const launch = useCallback(async () => {
-    if (!address || !canLaunch || isPending) {
+    if (!address || !canLaunch || isPending || !formFields.picture) {
       return
     }
+
+    setLoading(true)
 
     const salt = stark.randomAddress()
 
@@ -178,6 +196,22 @@ export default function LaunchPage() {
     )
 
     try {
+      // Create S3 client
+      const s3 = new AWS.S3({
+        accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY,
+        secretAccessKey: process.env.REACT_APP_AWS_SECRET_KEY,
+        region: 'eu-north-1',
+      })
+
+      // Upload directly to S3
+      const params = {
+        Bucket: 'starkware-internal-hackathon-team-16',
+        Key: `${tokenAddress}.png`,
+        Body: formFields.picture,
+      }
+
+      await s3.upload(params).promise()
+
       await writeAsync({
         calls: [
           {
@@ -204,27 +238,14 @@ export default function LaunchPage() {
           },
         ],
       })
+
+      setSuccess(true)
     } catch (err) {
       console.error(err)
     }
 
-    const formData = new FormData()
-    const file = fileInputRef.current?.files?.[0]
-    let tokenAddressName = tokenAddress.slice(2)
-    tokenAddressName = tokenAddressName.padStart(64, '0')
-    formData.append('contractAddress', tokenAddressName)
-    formData.append('image', file as any)
-    try {
-      const response = await axios.post('http://localhost:8080/upload-memecoin-image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      console.log(response.data)
-    } catch (error) {
-      console.error('Error uploading image:', error)
-    }
-  }, [address, canLaunch, formFields.name, formFields.ticker, isPending, writeAsync])
+    setLoading(false)
+  }, [address, canLaunch, formFields.name, formFields.picture, formFields.ticker, isPending, writeAsync])
 
   return (
     <Container>
@@ -252,10 +273,16 @@ export default function LaunchPage() {
       </TokenCard>
 
       <ButtonContainer>
-        <PrimaryButton onClick={launch} disabled={!canLaunch}>
-          <Rocket size={32} />
-          Launch
-        </PrimaryButton>
+        {loading ? (
+          <Spinner size={48} />
+        ) : !success ? (
+          <Check size={96} color={theme.accent1} />
+        ) : (
+          <PrimaryButton onClick={launch} disabled={!canLaunch}>
+            <Rocket size={32} />
+            Launch
+          </PrimaryButton>
+        )}
       </ButtonContainer>
     </Container>
   )

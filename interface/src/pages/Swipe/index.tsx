@@ -1,10 +1,15 @@
-import axios from 'axios'
+import { animated, interpolate, useSpring } from '@react-spring/web'
 import { Column, Row } from 'components/Flex'
 import useScreenSize from 'hooks/useScreenSize'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useDrag } from 'react-use-gesture'
+import { shortString } from 'starknet'
 import styled from 'styled-components'
 import { ThemedText } from 'theme/components'
-import { getRandomChart } from 'utils/random'
+import { formatWithAbbreviation } from 'utils/format'
+import { getRandomChart, getRandomInt, shuffleArray } from 'utils/random'
+
+import { Memecoin } from './types'
 
 import { SwipeContainer } from './SwipeContainer'
 
@@ -15,7 +20,13 @@ const Container = styled(Column)`
   overflow: hidden;
 `
 
-const TokenCard = styled(Column)<{ imageUrl: string }>`
+const TokenCardContainer = styled(animated.div)`
+  width: 100%;
+`
+
+const AnimatedColumn = animated(Column)
+
+const AnimatedTokenCard = styled(AnimatedColumn)<{ $imageUrl: string }>`
   position: relative;
   padding: 16px 20px;
   border-radius: 24px;
@@ -25,11 +36,12 @@ const TokenCard = styled(Column)<{ imageUrl: string }>`
   overflow: hidden;
   aspect-ratio: 1 / 1.16;
   align-items: flex-start;
-  background-image: url(${({ imageUrl }) => imageUrl});
+  background-image: url(${({ $imageUrl }) => $imageUrl});
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   flex-shrink: 0;
+  touch-action: none;
 `
 
 const Veil = styled.div`
@@ -54,6 +66,7 @@ const StatsContainer = styled(Row)`
   justify-content: space-around;
   width: 100%;
   height: 100%;
+  position: relative;
 `
 
 const Chart = styled.div<{ width: number; link: string; up: boolean }>`
@@ -72,46 +85,191 @@ const Chart = styled.div<{ width: number; link: string; up: boolean }>`
   margin-bottom: 42px;
 `
 
-const getNextToken = (setter: CallableFunction) => {
-  axios.get('http://localhost:3000/api/nextToken').then((response: any) => {
-    const token = response.data
-    setter(token)
-  })
-}
+const AmountContainer = styled(Row)`
+  display: flex;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  position: absolute;
+  z-index: 2;
+  justify-content: center;
+`
+
+const AnimatedAmountContainer = animated(AmountContainer)
+
+const Amount = styled(ThemedText.HeadlineLarge)`
+  font-size: 64px !important;
+  font-weight: 600;
+`
+
+// This is being used down there in the view, it interpolates rotation and scale into a css transform
+const trans = (r: number, s: number) =>
+  `perspective(1500px) rotateX(10deg) rotateY(${r / 10}deg) rotateZ(${r}deg) scale(${s})`
 
 export default function SwipePage() {
-  const imageUrl =
-    'https://www.nzherald.co.nz/resizer/v2/MZPPXBD4JBFNTM5NUPXBZOD5UM.jpg?auth=e22b3cd8e19b5d3ecc74617bad44fceb9649ad590d6c12637f225e0db382cd57&width=576&height=613&quality=70&smart=true'
+  const [memecoinIndex, setMemecoinIndex] = useState(0)
+  const [memecoins, setMemecoins] = useState<Memecoin[]>([])
+  const [shouldFetch, setShouldFetch] = useState(true)
+  const [amount, setAmount] = useState(0)
 
-  const chart = useMemo(() => getRandomChart(), [])
+  // fetch memecoins
+  useEffect(() => {
+    if (shouldFetch) {
+      setShouldFetch(false)
+
+      fetch('http://localhost:8080/get_memecoins')
+        .then((response) => response.json())
+        .then((res) => {
+          setMemecoins(shuffleArray(res?.data ?? []))
+        })
+    }
+  }, [shouldFetch])
+
+  const metrics = useMemo(
+    () => {
+      const mcap = (getRandomInt(100_000) + 4) * 1_000
+      const holders = (getRandomInt(5) * mcap) / 800
+
+      return {
+        chart: getRandomChart(),
+        mcap: formatWithAbbreviation(mcap, 0),
+        holders: formatWithAbbreviation(holders, 0),
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [memecoinIndex]
+  )
 
   const { width } = useScreenSize()
 
-  const [token, currentToken] = useState({})
+  // metrics animation
+  const [metricsSpringProps, metricSpringApi] = useSpring(() => ({
+    x: 0,
+    scale: 0,
+    config: { friction: 30, tension: 300 },
+  }))
+
+  // swiping gesture and animation
+  const [{ x, rot, scale }, api] = useSpring(() => ({
+    x: 0,
+    rot: 0,
+    scale: 1,
+    config: { friction: 50, tension: 500 },
+  }))
+
+  const bind = useDrag(({ down, movement: [mx], direction: [xDir], velocity }) => {
+    if (down) {
+      setAmount((prev) => prev + Math.ceil(Math.abs(mx) / 100))
+    }
+
+    const trigger = velocity > 0.2 // If you flick hard enough it should trigger the card to fly out
+    const dir = xDir < 0 ? -1 : 1 // Direction should either point left or right
+    const isGone = !down && trigger // If you let go and it's triggered, fly out
+    const isReleased = !down && !trigger // If you let go and it's not triggered, release
+
+    const x = isGone ? (200 + window.innerWidth) * dir : down ? mx : 0 // When a card is gone it flys out left or right, otherwise goes back to zero
+    const rot = mx / 100 + (isGone ? dir * 10 * velocity : 0) // How much the card tilts, flicking it harder makes it rotate faster
+    const scale = down ? 1.1 : 1 // Active cards lift up a bit
+    const metricsX = down ? 400 : 0
+    const metricsScale = down ? 1 : 0
+
+    if (isReleased) {
+      setAmount(0)
+    }
+
+    api.start({
+      x,
+      rot,
+      scale,
+      config: { friction: 40, tension: down ? 800 : isGone ? 250 : 500 },
+    })
+
+    metricSpringApi.start({
+      x: metricsX,
+      scale: metricsScale,
+      config: { friction: 40, tension: down ? 800 : 500 },
+    })
+
+    if (isGone) {
+      setTimeout(() => {
+        setMemecoinIndex((prev) => prev + 1)
+        setAmount(0)
+
+        metricSpringApi.start({ x: 0 })
+
+        api.start({
+          x: 0,
+          rot: 0,
+          scale: 0,
+          config: { duration: 0 },
+          onResolve: () => api.start({ scale: 1, config: { friction: 30, tension: 300 } }),
+        })
+      }, 500)
+    }
+  })
+
+  // current memecoin
+  const currentMemecoin = useMemo(() => {
+    const memecoin = memecoins[memecoinIndex]
+
+    if (!memecoin) {
+      return null
+    }
+
+    return {
+      name: shortString.decodeShortString(`0x${memecoin.name}`),
+      symbol: `$${shortString.decodeShortString(`0x${memecoin.symbol}`)}`,
+      imageUrl: `http://localhost:8080/memecoins/0x${memecoin.address}.png`,
+    }
+  }, [memecoinIndex, memecoins])
+
+  if (!currentMemecoin) {
+    return null
+  }
+
+  console.log(currentMemecoin.imageUrl)
 
   return (
-    <SwipeContainer>
-      <TokenCard imageUrl={imageUrl}>
-        <Veil />
-        <InfosContainer>
-          <ThemedText.HeadlineMedium>Peanut the squirrel</ThemedText.HeadlineMedium>
-          <ThemedText.BodySecondary>$PNUT</ThemedText.BodySecondary>
-        </InfosContainer>
-      </TokenCard>
+    <Container>
+      <TokenCardContainer style={{ x }}>
+        <AnimatedTokenCard
+          {...bind()}
+          $imageUrl={currentMemecoin.imageUrl}
+          style={{ transform: interpolate([rot, scale], trans) }}
+        >
+          <Veil />
+
+          <InfosContainer>
+            <ThemedText.HeadlineMedium dangerouslySetInnerHTML={{ __html: currentMemecoin.name }} />
+            <ThemedText.BodySecondary dangerouslySetInnerHTML={{ __html: currentMemecoin.symbol }} />
+          </InfosContainer>
+        </AnimatedTokenCard>
+      </TokenCardContainer>
 
       <StatsContainer>
-        <Column>
-          <ThemedText.HeadlineLarge>126M</ThemedText.HeadlineLarge>
-          <ThemedText.BodySecondary>Market cap</ThemedText.BodySecondary>
-        </Column>
+        <animated.div style={{ transform: metricsSpringProps.x.to((x: number) => `translateX(${-x}px)`) }}>
+          <Column>
+            <ThemedText.HeadlineLarge>{metrics.mcap}</ThemedText.HeadlineLarge>
+            <ThemedText.BodySecondary>Market cap</ThemedText.BodySecondary>
+          </Column>
+        </animated.div>
 
-        <Column>
-          <ThemedText.HeadlineLarge>75K</ThemedText.HeadlineLarge>
-          <ThemedText.BodySecondary>Holders</ThemedText.BodySecondary>
-        </Column>
+        <animated.div style={{ transform: metricsSpringProps.x.to((x: number) => `translateX(${x}px)`) }}>
+          <Column>
+            <ThemedText.HeadlineLarge>{metrics.holders}</ThemedText.HeadlineLarge>
+            <ThemedText.BodySecondary>Holders</ThemedText.BodySecondary>
+          </Column>
+        </animated.div>
+
+        <AnimatedAmountContainer
+          style={{ transform: metricsSpringProps.scale.to((scale: number) => `scale(${scale})`) }}
+        >
+          <Amount>${amount}</Amount>
+        </AnimatedAmountContainer>
       </StatsContainer>
 
-      <Chart width={width} {...chart} />
-    </SwipeContainer>
+      <Chart width={width} {...metrics.chart} />
+    </Container>
   )
 }
