@@ -27,7 +27,6 @@ const TokenCard = styled(Column)<{ image: FileReader['result'] }>`
   gap: 4px;
   background: ${({ theme }) => theme.surface3};
   width: 100%;
-  height: 110vw;
   overflow: hidden;
   aspect-ratio: 1 / 1.16;
   align-items: flex-start;
@@ -68,7 +67,7 @@ const TokenCard = styled(Column)<{ image: FileReader['result'] }>`
 
 const Veil = styled.div`
   position: absolute;
-  background-image: linear-gradient(180deg, ${({ theme }) => theme.surface2} 0%, transparent 25%);
+  background-image: linear-gradient(180deg, ${({ theme }) => theme.surface2} 0%, transparent 50%);
   top: 0;
   left: 0;
   right: 0;
