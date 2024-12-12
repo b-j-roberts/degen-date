@@ -1,11 +1,10 @@
 import { Column, Row } from "components/Flex";
 import useScreenSize from "hooks/useScreenSize";
-import { useMemo, useState } from "react";
+import { useMemo} from "react";
 import styled from "styled-components";
 import { ThemedText } from "theme/components";
 import { getRandomChart } from "utils/random";
 import { SwipeContainer } from "./SwipeContainer";
-import axios from "axios";
 
 const Container = styled(Column)`
   padding: 24px 24px 0;
@@ -75,13 +74,6 @@ const Chart = styled.div<{ width: number; link: string; up: boolean }>`
   margin-bottom: 42px;
 `;
 
-const getNextToken = (setter: CallableFunction) => {
-  axios.get("http://localhost:3000/api/nextToken").then((response: any) => {
-    const token = response.data;
-    setter(token);
-  });
-};
-
 export default function SwipePage() {
   const imageUrl =
     "https://www.nzherald.co.nz/resizer/v2/MZPPXBD4JBFNTM5NUPXBZOD5UM.jpg?auth=e22b3cd8e19b5d3ecc74617bad44fceb9649ad590d6c12637f225e0db382cd57&width=576&height=613&quality=70&smart=true";
@@ -89,8 +81,6 @@ export default function SwipePage() {
   const chart = useMemo(() => getRandomChart(), []);
 
   const { width } = useScreenSize();
-
-  const [token, currentToken] = useState({});
 
   return (
     <SwipeContainer>
