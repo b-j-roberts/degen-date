@@ -210,7 +210,9 @@ export default function LaunchPage() {
 
     const formData = new FormData()
     const file = fileInputRef.current?.files?.[0]
-    formData.append('contractAddress', tokenAddress)
+    let tokenAddressName = tokenAddress.slice(2)
+    tokenAddressName = tokenAddressName.padStart(64, '0')
+    formData.append('contractAddress', tokenAddressName)
     formData.append('image', file as any)
     try {
       const response = await axios.post('http://localhost:8080/upload-memecoin-image', formData, {
