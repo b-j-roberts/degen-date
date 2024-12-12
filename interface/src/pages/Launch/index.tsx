@@ -7,12 +7,12 @@ import { MEMECOIN_CLASS_HASH, STRK_ADDRESS, UNRUG_FACTORY_ADDRESS } from 'consta
 import { DEFAULT_SUPPLY, Entrypoint } from 'constants/misc'
 import { useAtom } from 'jotai'
 import { Check, LoaderCircle, Pencil, Rocket } from 'lucide-react'
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { CallData, hash, shortString, stark, uint256 } from 'starknet'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { CallData, hash, shortString, stark, uint256, validateAndParseAddress } from 'starknet'
 import styled, { useTheme } from 'styled-components'
 import { ThemedText } from 'theme/components'
 
-import { formFieldsAtom } from './atom'
+import { formFieldsAtom, INITIAL_FORM_FIELDS_STATE } from './atom'
 import { FieldName, schema } from './utils'
 
 const Container = styled(Column)`
@@ -125,6 +125,7 @@ export default function LaunchPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [rawFile, setRawFile] = useState<File | null>(null)
 
   // theme
   const theme = useTheme()
@@ -153,6 +154,7 @@ export default function LaunchPage() {
       const file = event.target.files?.[0]
 
       if (file) {
+        setRawFile(file)
         const reader = new FileReader()
         reader.onloadend = () => {
           setFormFields((prev) => ({ ...prev, picture: reader.result }))
@@ -172,7 +174,7 @@ export default function LaunchPage() {
   const { address } = useAccount()
   const { writeAsync, isPending } = useContractWrite({})
   const launch = useCallback(async () => {
-    if (!address || !canLaunch || isPending || !formFields.picture) {
+    if (!address || !canLaunch || isPending || !rawFile) {
       return
     }
 
@@ -206,8 +208,8 @@ export default function LaunchPage() {
       // Upload directly to S3
       const params = {
         Bucket: 'starkware-internal-hackathon-team-16',
-        Key: `${tokenAddress}.png`,
-        Body: formFields.picture,
+        Key: `${validateAndParseAddress(tokenAddress)}.png`,
+        Body: rawFile,
       }
 
       await s3.upload(params).promise()
@@ -245,7 +247,18 @@ export default function LaunchPage() {
     }
 
     setLoading(false)
-  }, [address, canLaunch, formFields.name, formFields.picture, formFields.ticker, isPending, writeAsync])
+  }, [address, canLaunch, formFields.name, formFields.ticker, isPending, rawFile, writeAsync])
+
+  // reset after success
+  useEffect(() => {
+    if (success) {
+      setTimeout(() => {
+        setSuccess(false)
+        setFormFields(INITIAL_FORM_FIELDS_STATE)
+      }, 1000)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [success])
 
   return (
     <Container>
