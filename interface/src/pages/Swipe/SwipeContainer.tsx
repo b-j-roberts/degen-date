@@ -1,11 +1,12 @@
-import {Column} from 'components/Flex';
-import {useState} from 'react';
-import {styled} from 'styled-components';
+import { Column } from "components/Flex";
+import { useState } from "react";
+import { styled } from "styled-components";
 
 const Container = styled(Column)`
   padding: 24px 24px 0;
   width: 100%;
   height: 100%;
+  // overflow: hidden;
 `;
 
 type SwipeContainerProps = {
@@ -18,23 +19,19 @@ type SwipeContainerProps = {
 
 export const SwipeContainer = ({
   children,
-  swipeDownCallback,
   swipeLeftCallback,
   swipeRightCallback,
-  swipeUpCallback
 }: SwipeContainerProps) => {
-  const screenWith = window.innerWidth;
-  const screenHight = window.innerHeight;
-  const [position, setPosition] = useState({x: 170, y: 190});
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
-  const [offset, setOffset] = useState({x: 0, y: 0});
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
 
   const handleTouchDown = (e: any) => {
     const touch = e.touches[0];
     setDragging(true);
     setOffset({
       x: touch.clientX - position.x,
-      y: touch.clientY - position.y
+      y: touch.clientY - position.y,
     });
   };
 
@@ -43,20 +40,22 @@ export const SwipeContainer = ({
       const touch = e.touches[0];
       setPosition({
         x: touch.clientX - offset.x,
-        y: touch.clientY - offset.y
+        y: touch.clientY - offset.y,
       });
     }
   };
 
   const handleTouchUp = () => {
     setDragging(false);
-    if (position.x > 270 ) {
-        swipeRightCallback?.();
-      } else if (position.x < 100) {
-        swipeLeftCallback?.();
-      }
+    if (position.x > 100) {
+      alert("right")
+      swipeRightCallback?.();
+    } else if (position.x < -100) {
+      alert("left")
+      swipeLeftCallback?.();
+    }
 
-    setPosition({x: 170, y: 190});
+    setPosition({ x: 0, y: 0 });
   };
 
   return (
@@ -66,17 +65,11 @@ export const SwipeContainer = ({
       onTouchEnd={handleTouchUp}
       onMouseLeave={handleTouchUp}
       style={{
-        position: 'absolute',
+        position: "absolute",
         left: position.x,
         top: position.y,
-        cursor: dragging ? 'grabbing' : 'grab',
-        width: '100px',
-        height: '100px',
-        backgroundColor: 'lightblue',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        userSelect: 'none' // Prevents text selection while dragging
+        cursor: dragging ? "grabbing" : "grab",
+        userSelect: "none", // Prevents text selection while dragging
       }}
     >
       {children}
