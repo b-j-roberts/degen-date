@@ -1,11 +1,10 @@
 import { Column, Row } from "components/Flex";
 import useScreenSize from "hooks/useScreenSize";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo} from "react";
 import styled from "styled-components";
 import { ThemedText } from "theme/components";
 import { getRandomChart } from "utils/random";
 import { SwipeContainer } from "./SwipeContainer";
-import axios, { AxiosResponse } from "axios";
 
 const Container = styled(Column)`
   padding: 24px 24px 0;
@@ -82,7 +81,6 @@ export default function SwipePage() {
   const chart = useMemo(() => getRandomChart(), []);
 
   const { width } = useScreenSize();
-
 
   return (
     <SwipeContainer>
