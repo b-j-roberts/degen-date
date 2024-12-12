@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/png"
 	"math/rand"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -14,82 +15,15 @@ import (
 	routeutils "github.com/b-j-roberts/degen-date/backend/routes/utils"
 )
 
-func getCoinById(w http.ResponseWriter, r *http.Request) {
-
-	coinId := r.PathValue("id")
-
-	coinBasics, error := dbFunctions.PostgresQueryOne[CoinBasicDetails]("SELECT * FROM public.coins WHERE id = $1", coinId)
-
+func getMemeCoins(w http.ResponseWriter, r *http.Request) {
+	coins, error := dbFunctions.PostgresQueryJson[MemeCoin]("SELECT * FROM public.MemeCoins WHERE launched = TRUE")
 	if error != nil {
-		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get coin of id "+coinId)
+		fmt.Println(error)
+		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get memecoins")
 		return
 	}
 
-	coinTradingDetails, error := dbFunctions.PostgresQueryOne[TradingDetails]("SELECT * FROM public.trading WHERE id = $1", coinId)
-
-	if error != nil {
-		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get coin of id "+coinId)
-		return
-	}
-
-	coin := Coin{
-		Address:   coinBasics.Address,
-		Ticker:    coinBasics.Ticker,
-		Name:      coinBasics.Name,
-		Decimals:  coinBasics.Decimals,
-		ImageUrl:  coinBasics.ImageUrl,
-		Volume:    coinTradingDetails.Volume,
-		Holders:   coinTradingDetails.Holders,
-		MarketCap: coinTradingDetails.MarketCap,
-		Price:     coinTradingDetails.Price,
-	}
-
-	resp, error := json.Marshal(coin)
-	if error != nil {
-		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get coin of id "+coinId)
-		return
-	}
-	w.Write(resp)
-}
-
-func getCoinLineup(w http.ResponseWriter, r *http.Request) {
-	routeutils.SetupHeaders(w)
-
-	coins, error := dbFunctions.PostgresQuery[CoinBasicDetails]("SELECT * FROM coins")
-	println(coins)
-	println(error)
-	if error != nil {
-		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get coin lineup")
-		return
-	}
-
-	rand.Shuffle(len(coins), func(i, j int) {
-		coins[i], coins[j] = coins[j], coins[i]
-	})
-
-	resp, err := json.Marshal(coins)
-	if err != nil {
-		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to get coin lineup")
-		return
-	}
-	w.Write(resp)
-}
-
-func addCoin(w http.ResponseWriter, r *http.Request) {
-	routeutils.SetupHeaders(w)
-	newCoin, err := routeutils.ReadJsonBody[newCoinRequest](r)
-
-	if err != nil {
-		routeutils.WriteErrorJson(w, http.StatusBadRequest, "Failed to add new coin")
-		return
-	}
-
-	_, err = dbFunctions.PostgresQueryJson[CoinBasicDetails]("INSERT INTO coins (tx_hash, address, ticker, name, decimals, image_url) VALUES ($1, $2, $3, $4, $5)", newCoin.TxHash, newCoin.Ticker, "", 0, newCoin.ImageUrl)
-
-	if err != nil {
-		routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Failed to add new coin")
-		return
-	}
+	routeutils.WriteDataJson(w, string(coins))
 }
 
 func uploadMemecoinImage(w http.ResponseWriter, r *http.Request) {
@@ -145,4 +79,5 @@ func InitRoutes() {
 	http.HandleFunc("/lineup", getCoinLineup)
   http.HandleFunc("/upload-memecoin-image", uploadMemecoinImage)
   http.Handle("/memecoins/", http.StripPrefix("/memecoins/", http.FileServer(http.Dir("./memecoins"))))
+	http.HandleFunc("/get_memecoins", getMemeCoins)
 }
