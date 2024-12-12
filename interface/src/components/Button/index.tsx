@@ -65,6 +65,7 @@ export const CircleButton = styled.button`
   font-size: 24px;
   font-weight: 500;
   transition: opacity 100ms;
+  padding-bottom: 4px;
 
   background: radial-gradient(50% 50% at 50% 50%, #6321f2 0%, #7236f3 100%);
   box-shadow: ${({ theme }) => `0px 4px 4px ${theme.surface1}40, 0px 4px 20px 4px ${theme.accent1}64`};

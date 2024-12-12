@@ -1,6 +1,7 @@
 import { useDisconnect } from '@starknet-react/core'
 import { CircleButton, PrimaryButton, SecondaryButton } from 'components/Button'
 import { Column, Row } from 'components/Flex'
+import { ActiveLink } from 'components/Link/ActiveLink'
 import styled from 'styled-components'
 import { ThemedText } from 'theme/components'
 
@@ -61,6 +62,15 @@ const TokenIcon = styled.img`
   margin-right: 8px;
 `
 
+const NavLink = styled(ActiveLink)`
+  text-decoration: none;
+  color: ${({ theme }) => theme.neutral1};
+
+  & > svg.active {
+    fill: ${({ theme }) => theme.neutral1};
+  }
+`
+
 export default function DashboardPage() {
   const assets = [
     {
@@ -118,7 +128,9 @@ export default function DashboardPage() {
           </Asset>
         ))}
         <ButtonContainer>
-          <SecondaryButton>Explore</SecondaryButton>
+          <NavLink to="/swipe">
+            <SecondaryButton>Explore</SecondaryButton>
+          </NavLink>
         </ButtonContainer>
       </DashboardInfo>
       <ButtonContainer>
