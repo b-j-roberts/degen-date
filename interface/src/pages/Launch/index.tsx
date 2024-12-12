@@ -1,4 +1,5 @@
 import { useAccount, useContractWrite } from '@starknet-react/core'
+import axios from 'axios'
 import { PrimaryButton } from 'components/Button'
 import { Column, Row } from 'components/Flex'
 import Input from 'components/Input'
@@ -205,6 +206,23 @@ export default function LaunchPage() {
       })
     } catch (err) {
       console.error(err)
+    }
+
+    const formData = new FormData()
+    const file = fileInputRef.current?.files?.[0]
+    let tokenAddressName = tokenAddress.slice(2)
+    tokenAddressName = tokenAddressName.padStart(64, '0')
+    formData.append('contractAddress', tokenAddressName)
+    formData.append('image', file as any)
+    try {
+      const response = await axios.post('http://localhost:8080/upload-memecoin-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      console.log(response.data)
+    } catch (error) {
+      console.error('Error uploading image:', error)
     }
   }, [address, canLaunch, formFields.name, formFields.ticker, isPending, writeAsync])
 

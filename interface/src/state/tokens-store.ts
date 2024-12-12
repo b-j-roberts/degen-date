@@ -1,23 +1,22 @@
-import 'immer'
 import immer from 'immer'
 import { StoreState } from 'state'
 import { StateCreator } from 'zustand'
 
-export type Token = {
-  name: string;
-  ticker: string;
-  balance: number;
-  conversion: number;
-};
+type Token = {
+  name: string
+  ticker: string
+  balance: number
+  conversion: number
+}
 
 type State = {
-  tokens: Token[];
-};
+  tokens: Token[]
+}
 
 type Actions = {
-  addToken: (token: Token) => void;
-  clearTokens: () => void;
-};
+  addToken: (token: Token) => void
+  clearTokens: () => void
+}
 
 const initialState: State = {
   tokens: [
@@ -46,9 +45,9 @@ const initialState: State = {
       conversion: 0.0004,
     },
   ],
-};
+}
 
-export type TokensSlice = State & Actions;
+export type TokensSlice = State & Actions
 
 export const createTokensSlice: StateCreator<
   StoreState,
