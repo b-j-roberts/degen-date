@@ -18,7 +18,16 @@ export const config = {
       {
         fromAddress: UNRUGGABLE_CONTRACT_ADDRESS,
         keys: [
-          MEMECOIN_CREATED_EVENT_KEY 
+          MEMECOIN_CREATED_EVENT_KEY,
+        ],
+        includeReverted: false,
+        includeTransaction: true,
+        includeReceipt: false
+      },
+      {
+        fromAddress: UNRUGGABLE_CONTRACT_ADDRESS,
+        keys: [
+          MEMECOIN_LAUNCHED_EVENT_KEY,
         ],
         includeReverted: false,
         includeTransaction: true,
