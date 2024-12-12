@@ -48,10 +48,8 @@ export const SwipeContainer = ({
   const handleTouchUp = () => {
     setDragging(false);
     if (position.x > 100) {
-      alert("right")
       swipeRightCallback?.();
     } else if (position.x < -100) {
-      alert("left")
       swipeLeftCallback?.();
     }
 
